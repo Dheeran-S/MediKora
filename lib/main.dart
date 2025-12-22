@@ -6,9 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'navigation_menu.dart';
-import 'package:app/database/local_medicament_stock.dart';
 import 'package:app/env/env.dart';
-import 'package:firebase_database/firebase_database.dart';
 
 
 void main() async {
@@ -24,17 +22,9 @@ void main() async {
   );
 
 
-  // 🔍 TEMP: Test Firebase Realtime Database connection
-  // final snapshot = await FirebaseDatabase.instance
-  //     .ref()
-  //     .child('brands')
-  //     .once();
-  //
-  // print('🔥 Firebase brands test: ${snapshot.snapshot.value}');
 
   
   await ReminderDatabase().initDatabase();
-  await MedicamentStock().initDatabase();
 
   await Permission.notification.isDenied.then((value) {
     if (value) {

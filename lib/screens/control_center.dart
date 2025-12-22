@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:app/screens/add_reminder_screen.dart';
 import 'package:app/screens/settings_screen.dart';
 import 'package:app/screens/scan_prescription.dart';
 import 'manage_reminders_screen.dart';
@@ -9,14 +8,15 @@ Future<void> _saveScannedReminders(
     List<Map<String, dynamic>> scannedReminders) async {
 
   final reminderDb = ReminderDatabase();
+  final existing = await reminderDb.getReminders();
+  int nextId = existing.isEmpty ? 1 : existing.last.id + 1;
 
   for (final data in scannedReminders) {
-    final reminderId = DateTime.now().millisecondsSinceEpoch;
 
     final reminder = Reminder(
-      id: reminderId,
-      reminderName: data['reminderName'],
-      medicineName: data['reminderName'], // key point
+      id: nextId++,
+      reminderName: data['reminderName'] ?? '',
+      medicineName: data['reminderName'] ?? '',
       selectedDays: List<bool>.from(data['selectedDays']),
       startDate: data['startDate'],
       endDate: data['endDate'],
@@ -24,19 +24,29 @@ Future<void> _saveScannedReminders(
       times: List<TimeOfDay>.from(data['times']),
     );
 
-    // 1️⃣ Save reminder
-    await reminderDb.insertReminder(reminder);
+    // 1️⃣ Insert reminder and get real DB ID
+    final int newId = await reminderDb.insertReminder(reminder);
 
-    // 2️⃣ Generate reminder cards + notifications
-    await reminderDb.updateReminderCards(reminder);
+    // 2️⃣ Create reminder with correct ID
+    final savedReminder = Reminder(
+      id: newId,
+      reminderName: reminder.reminderName,
+      medicineName: reminder.medicineName,
+      selectedDays: reminder.selectedDays,
+      startDate: reminder.startDate,
+      endDate: reminder.endDate,
+      intakeQuantity: reminder.intakeQuantity,
+      times: reminder.times,
+    );
+
+    // 3️⃣ Generate reminder cards + notifications
+    await reminderDb.updateReminderCards(savedReminder);
   }
-
-  // 3️⃣ Refresh UI so reminders appear
-   setState(() {});
 }
 
 
-void showControlCenter(BuildContext context, VoidCallback onReminderSaved, Future<List<Medicament>> medicamentList, VoidCallback onMedicamentListUpdated) {
+
+void showControlCenter(BuildContext context, VoidCallback onReminderSaved) {
   showModalBottomSheet(
     context: context,
     builder: (BuildContext context) {
@@ -76,31 +86,9 @@ void showControlCenter(BuildContext context, VoidCallback onReminderSaved, Futur
                         if (remindersData != null &&
                             remindersData is List<Map<String, dynamic>>) {
                           await _saveScannedReminders(remindersData);
+                          onReminderSaved(); // refresh HomeScreen
                         }
 
-
-                        // If reminders data was returned, handle it
-                        if (remindersData != null && remindersData is List<Map<String, dynamic>>) {
-                          // You can either:
-                          // 1. Save them directly to your database here
-                          // 2. Pass them to AddReminderPage to review/edit
-                          // 3. Show a confirmation dialog
-
-                          // Option 2 - Navigate to AddReminderPage with the data
-                          // (You'll need to modify AddReminderPage to accept this data)
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => AddReminderPage(
-                                onReminderSaved: onReminderSaved,
-                                medicamentList: medicamentList,
-                                onMedicamentListUpdated: onMedicamentListUpdated,
-                                isEditing: false,
-                                // prescriptionReminders: remindersData, // Pass the data
-                              ),
-                            ),
-                          );
-                        }
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
@@ -127,8 +115,6 @@ void showControlCenter(BuildContext context, VoidCallback onReminderSaved, Futur
                           MaterialPageRoute(
                             builder: (context) => ManageRemindersScreen(
                               onReminderSaved: onReminderSaved,
-                              medicamentList: medicamentList,
-                              onMedicamentListUpdated: onMedicamentListUpdated,
                             ),
                           ),
                         );

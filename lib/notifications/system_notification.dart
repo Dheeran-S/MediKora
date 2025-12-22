@@ -1,50 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:app/model/medicaments.dart';
 import 'dart:async';
-import '../database/local_medicament_stock.dart';
 import '../model/reminders.dart';
 
 FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
 /// NOTIFICATION SINGLE MEDICAMENT *
-void notifyMedicamentCloseToExpire(Medicament medicament) async {
-  String medicamentName = medicament.name;
-  String title = '$medicamentName is close to its expiration date!';
-  String body = 'Check if you need to use it before it expires';
+
+
+Future<void> notificationMedicineReminder({
+  required String medicineName,
+  required String reminderName,
+  required TimeOfDay timeToTake,
+}) async {
+  final hour = timeToTake.hour.toString().padLeft(2, '0');
+  final minute = timeToTake.minute.toString().padLeft(2, '0');
+
+  final String title = 'Time to take $medicineName';
+  final String body =
+  reminderName.isNotEmpty
+      ? reminderName
+      : 'Scheduled at $hour:$minute';
 
   await showNotification(title, body);
 }
 
-void notifyMedicamentExpired(Medicament medicament) async {
-  String medicamentName = medicament.name;
-  String title = '$medicamentName has expired!';
-  String body = 'Dispose of it properly';
-
-  await showNotification(title, body);
-}
-
-void notifyMedicamentRunningLow(Medicament medicament) async {
-  String title = 'Stock is Running Low!';
-  String body;
-  if (medicament.quantity == 1) {
-    body = '${medicament.name} only has 1 piece remaining';
-  } else if (medicament.quantity == 0) {
-    body = '${medicament.name} is out of stock';
-  } else {
-    body = '${medicament.name} only has ${medicament.quantity} pieces remaining';
-  }
-  showNotification(title, body);
-}
-
-void notificationMedicationReminder(Medicament medicament, TimeOfDay timeToTakeMeds) async {
-  int hour = timeToTakeMeds.hour;
-  int minute = timeToTakeMeds.minute;
-  String title = 'It\'s time to take your {$hour:$minute} meds!';
-  String body = 'Don\'t forget to mark as taken';
-
-  await showNotification(title, body);
-}
 
 /// NOTIFICATION HANDLER *
 Future<void> showNotification(String notificationTitle, String notificationText) async {
@@ -103,19 +83,35 @@ Future<void> cancelReminderCardsTimers(int reminderId) async {
 }
 
 Future<void> setTimersOnAppStart() async {
-  // Fetch all reminders and set timers
+  // Fetch all reminders
   List<Reminder> reminders = await ReminderDatabase().getReminders();
+
   for (Reminder reminder in reminders) {
-    List<ReminderCard> reminderCards = await ReminderDatabase().getReminderCardsByReminderId(reminder.id);
+    List<ReminderCard> reminderCards =
+    await ReminderDatabase().getReminderCardsByReminderId(reminder.id);
+
     for (ReminderCard reminderCard in reminderCards) {
+      final DateTime reminderDateTime = DateTime(
+        reminderCard.day.year,
+        reminderCard.day.month,
+        reminderCard.day.day,
+        reminderCard.time.hour,
+        reminderCard.time.minute,
+      );
 
-      DateTime reminderDateTime = DateTime(reminderCard.day.year, reminderCard.day.month, reminderCard.day.day, reminderCard.time.hour, reminderCard.time.minute);
-
-      // If the reminder DateTime is in the future, schedule a notification
+      // Schedule only future notifications
       if (reminderDateTime.isAfter(DateTime.now())) {
-        Medicament? medicament = await MedicamentStock().getMedicamentById(reminder.medicament);
-        String message = reminder.reminderName == '' ? 'It\'s time to take your medicament!' : reminder.reminderName;
-        scheduleNotification(reminderCard.cardId, medicament!.name, message, reminderDateTime);
+        final String message =
+        reminder.reminderName.isEmpty
+            ? 'It\'s time to take your medicine'
+            : reminder.reminderName;
+
+        scheduleNotification(
+          reminderCard.cardId,
+          reminder.medicineName,
+          message,
+          reminderDateTime,
+        );
       }
     }
   }

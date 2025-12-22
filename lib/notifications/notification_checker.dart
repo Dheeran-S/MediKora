@@ -1,7 +1,4 @@
 import 'dart:async';
-import 'package:app/model/medicaments.dart';
-import 'package:app/database/local_medicament_stock.dart';
-import 'package:app/notifications/system_notification.dart';
 
 /** DAILY CHECKER **/
 DateTime _lastCalledDay = DateTime.now();

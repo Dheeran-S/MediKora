@@ -1,10 +1,7 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
-import 'model/medicaments.dart';
 import 'screens/home_screen.dart';
-import 'screens/stock_screen.dart';
 import 'package:app/screens/control_center.dart';
-import 'package:app/database/local_medicament_stock.dart';
 
 class NavigationMenu extends StatefulWidget {
   const NavigationMenu({super.key});
@@ -14,17 +11,6 @@ class NavigationMenu extends StatefulWidget {
 }
 
 class NavigationMenuState extends State<NavigationMenu> {
-  late Future<List<Medicament>> _medicamentList;
-
-  Future<List<Medicament>> getMedicaments() async {
-    return await MedicamentStock().getMedicaments();
-  }
-
-  void refreshStockList() {
-    setState(() {
-      _medicamentList = getMedicaments();
-    });
-  }
 
   void _refreshHomeScreenOnReminderSaved() {
     setState(() {});
@@ -34,20 +20,12 @@ class NavigationMenuState extends State<NavigationMenu> {
 
   List<Widget> get screens => [
     HomeScreen(onReminderSaved: _refreshHomeScreenOnReminderSaved),
-    StockScreen(selectionMode: false, medicamentList: _medicamentList, onMedicamentListUpdated: refreshStockList,),
   ];
 
   void onItemTapped(int index) {
     setState(() {
       selectedIndex = index;
-      if (selectedIndex == 1) refreshStockList();
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    refreshStockList();
   }
 
   @override
@@ -141,28 +119,9 @@ class NavigationMenuState extends State<NavigationMenu> {
                         size: 24,
                       ),
                       onPressed: () {
-                        showControlCenter(context, _refreshHomeScreenOnReminderSaved, _medicamentList, refreshStockList);
+                        showControlCenter(context, _refreshHomeScreenOnReminderSaved);
                       },
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: IconButton(
-                    key: const Key('stock screen button'),
-                    icon: ColorFiltered(
-                      colorFilter: ColorFilter.mode(
-                        selectedIndex == 1 ? const Color.fromRGBO(185, 137, 102, 1) : const Color.fromRGBO(230, 217, 206, 1),
-                        BlendMode.srcIn,
-                      ),
-                      child: Image.asset(
-                        'assets/icons/box_icon.png',
-                        width: 32,
-                        height: 32,
-                      ),
-                    ),
-                    onPressed: () => onItemTapped(1),
-                    highlightColor: Colors.transparent,
                   ),
                 ),
               ],

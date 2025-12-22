@@ -1,16 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:app/model/medicaments.dart';
-import 'package:app/database/local_medicament_stock.dart';
 import 'package:app/model/reminders.dart';
-import '../notifications/notification_checker.dart';
 
 class MedicationReminderCard extends StatefulWidget {
   final Function(ReminderCard) onCardUpdated;
   final String cardId;
   final int reminderId;
-  final Medicament? medicament;
+  final String medicineName;
   final DateTime day;
   final TimeOfDay time;
   final int intakeQuantity;
@@ -23,7 +20,7 @@ class MedicationReminderCard extends StatefulWidget {
     required this.onCardUpdated,
     required this.cardId,
     required this.reminderId,
-    required this.medicament,
+    required this.medicineName,
     required this.day,
     required this.time,
     required this.intakeQuantity,
@@ -114,7 +111,7 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
                               ],
                             ),
                             Text(
-                              widget.medicament!.name,
+                              widget.medicineName,
                               style: TextStyle(
                                 fontFamily: 'Open_Sans',
                                 fontWeight: FontWeight.bold,
@@ -262,7 +259,7 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  widget.medicament!.name,
+                  widget.medicineName,
                   style: const TextStyle(
                     fontFamily: 'Open_Sans',
                     fontWeight: FontWeight.bold,
@@ -412,55 +409,34 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
       },
     );
   }
-
   Future<void> _takeMedicament(BuildContext context) async {
     TimeOfDay now = TimeOfDay.now();
 
-    int currentQuantity = await MedicamentStock().getMedicamentQuantity(widget.medicament!);
+    final updatedCard = ReminderCard(
+      cardId: widget.cardId,
+      reminderId: widget.reminderId,
+      day: widget.day,
+      time: widget.time,
+      intakeQuantity: widget.intakeQuantity,
+      isTaken: true,
+      isJumped: false,
+      pressedTime: now,
+    );
 
-    int newQuantity = currentQuantity - widget.intakeQuantity;
+    await ReminderDatabase().updateReminderCard(updatedCard);
 
-    if (newQuantity < 0) {
-      showAlertDialog(context, 'Out of Stock', '${widget.medicament!.name} is out of stock.');
-      if (!isTakeButton) Navigator.pop(context);
-    } else if (widget.medicament!.checkExpired()) {
-      showAlertDialog(context, 'Medicament Expired', '${widget.medicament!.name} has expired.');
-      if (!isTakeButton) Navigator.pop(context);
-    } else {
-      Medicament? updatedMedicament = await MedicamentStock().changeMedicamentQuantity(widget.medicament!, newQuantity);
+    setState(() {
+      isTaken = true;
+      isJumped = false;
+      pressedTime = now;
+    });
 
-      final updatedCard = ReminderCard(
-        cardId: widget.cardId,
-        reminderId: widget.reminderId,
-        day: widget.day,
-        time: widget.time,
-        intakeQuantity: widget.intakeQuantity,
-        isTaken: true,
-        isJumped: false,
-        pressedTime: now,
-      );
+    widget.onCardUpdated(updatedCard);
 
-      await ReminderDatabase().updateReminderCard(updatedCard);
-
-      setState(() {
-        isTaken = true;
-        isJumped = false;
-        pressedTime = now;
-      });
-
-      verifyMedicamentRunningLow(updatedMedicament!);
-    }
-
-    if (!isTakeButton) Navigator.pop(context);
+    Navigator.pop(context);
   }
 
   Future<void> _unTakeMedicament(BuildContext context) async {
-    int currentQuantity = await MedicamentStock().getMedicamentQuantity(widget.medicament!);
-
-    int newQuantity = currentQuantity + widget.intakeQuantity;
-
-    Medicament? updatedMedicament = await MedicamentStock().changeMedicamentQuantity(widget.medicament!, newQuantity);
-
     final updatedCard = ReminderCard(
       cardId: widget.cardId,
       reminderId: widget.reminderId,
@@ -480,10 +456,11 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
       pressedTime = null;
     });
 
-    verifyMedicamentRunningLow(updatedMedicament!);
+    widget.onCardUpdated(updatedCard);
 
     Navigator.pop(context);
   }
+
 
   Future<void> _skipMedicamentIntake(BuildContext context) async {
     final updatedCard = ReminderCard(

@@ -3,7 +3,6 @@ import 'package:app/model/reminders.dart';
 import 'package:app/widgets/calendar_widget.dart';
 import 'package:app/widgets/medication_reminder_card_widget.dart';
 import 'package:app/widgets/elipse_background.dart';
-import 'package:app/database/local_medicament_stock.dart';
 
 late Future<List<Reminder>> _remindersFuture;
 
@@ -148,17 +147,18 @@ class HomeScreenState extends State<HomeScreen> {
           ...reminderCardInfos.map((info) {
             return MedicationReminderCard(
               onCardUpdated: (updatedCard) {
-                  // Find the index of the reminder card in the list
-                  int index = reminderCardInfos.indexWhere((info) => info.reminderCard.cardId == updatedCard.cardId);
+                int index = reminderCardInfos.indexWhere(
+                      (info) => info.reminderCard.cardId == updatedCard.cardId,
+                );
 
-                  // Update the reminder card in the list
-                  if (index != -1) {
-                    reminderCardInfos[index] = _ReminderCardInfo(updatedCard, reminderCardInfos[index].reminder, reminderCardInfos[index].medicament);
-                  }
+                if (index != -1) {
+                  reminderCardInfos[index] =
+                      _ReminderCardInfo(updatedCard, reminderCardInfos[index].reminder);
+                }
               },
               cardId: info.reminderCard.cardId,
               reminderId: info.reminderCard.reminderId,
-              medicament: info.medicament,
+              medicineName: info.reminder.medicineName,
               day: info.reminderCard.day,
               time: info.reminderCard.time,
               intakeQuantity: info.reminderCard.intakeQuantity,
@@ -171,17 +171,21 @@ class HomeScreenState extends State<HomeScreen> {
         ],
     );
   }
+  Future<List<_ReminderCardInfo>> _getReminderCardInfos(
+      List<ReminderWithCards> reminderWithCardsList) async {
 
-  Future<List<_ReminderCardInfo>> _getReminderCardInfos(List<ReminderWithCards> reminderWithCardsList) async {
     List<_ReminderCardInfo> reminderCardInfos = [];
+
     for (var reminderWithCards in reminderWithCardsList) {
-      Medicament? medicament = await MedicamentStock().getMedicamentById(reminderWithCards.reminder.medicament);
       for (var reminderCard in reminderWithCards.reminderCards) {
-        reminderCardInfos.add(_ReminderCardInfo(reminderCard, reminderWithCards.reminder, medicament!));
+        reminderCardInfos.add(
+          _ReminderCardInfo(reminderCard, reminderWithCards.reminder),
+        );
       }
     }
     return reminderCardInfos;
   }
+
 
   int _compareTimeOfDay(TimeOfDay a, TimeOfDay b) {
     int hourComparison = a.hour.compareTo(b.hour);
@@ -232,7 +236,6 @@ class ReminderWithCards {
 class _ReminderCardInfo {
   final ReminderCard reminderCard;
   final Reminder reminder;
-  final Medicament medicament;
 
-  _ReminderCardInfo(this.reminderCard, this.reminder, this.medicament);
+  _ReminderCardInfo(this.reminderCard, this.reminder);
 }

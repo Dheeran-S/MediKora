@@ -1,36 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
-import '../database/local_medicament_stock.dart';
-import '../model/medicaments.dart';
 import '../model/reminders.dart';
-import 'add_reminder_screen.dart';
 
 class ManageRemindersScreen extends StatefulWidget {
-  Future<List<Medicament>> medicamentList;
   final VoidCallback onReminderSaved;
-  final VoidCallback onMedicamentListUpdated;
 
-  ManageRemindersScreen({
+  const ManageRemindersScreen({
     super.key,
     required this.onReminderSaved,
-    required this.medicamentList,
-    required this.onMedicamentListUpdated,
   });
-
   @override
   _ManageRemindersScreenState createState() => _ManageRemindersScreenState();
 }
 
 class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
   List<Reminder> reminders = [];
-  List<Medicament> medicaments = [];
 
   @override
   void initState() {
     super.initState();
     fetchReminders();
-    fetchMedicaments();
   }
 
   fetchReminders() async {
@@ -38,10 +28,7 @@ class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
     setState(() {});
   }
 
-  fetchMedicaments() async {
-    medicaments = await MedicamentStock().getMedicaments();
-    setState(() {});
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -77,8 +64,7 @@ class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
             itemCount: reminders.length,
             itemBuilder: (context, index) {
               Reminder reminder = reminders[index];
-              Medicament medicament = medicaments.firstWhere((
-                  medicament) => medicament.id == reminder.medicament);
+              final medicineName = reminder.medicineName;
               String formattedStartDate = DateFormat('yyyy/MM/dd').format(reminder.startDate);
               String formattedEndDate = DateFormat('yyyy/MM/dd').format(reminder.endDate);
               return Card(
@@ -97,7 +83,7 @@ class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
                           text: TextSpan(
                             children: <TextSpan>[
                               TextSpan(
-                                text: '${medicament.name} ',
+                                text: '${medicineName} ',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -216,53 +202,6 @@ class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
                           children: <Widget>[
                             IconButton(
                               icon: const Icon(
-                                FontAwesomeIcons.pen,
-                              ),
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => AddReminderPage(
-                                      onReminderSaved: widget.onReminderSaved,
-                                      medicamentList: widget.medicamentList,
-                                      onMedicamentListUpdated: widget.onMedicamentListUpdated,
-                                      isEditing: true,
-                                      editingReminder: reminder,
-                                      reminderMedicament: medicament,
-                                    ),
-                                  ),
-                                ).then((value) {
-                                  fetchReminders();
-                                  fetchMedicaments();
-                                  if (value == true) {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: const Text('Reminder Updated'),
-                                          content: const Text('Updates will take effect from the start of the next day'),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              child: const Text(
-                                                'OK',
-                                                style: TextStyle(
-                                                  color: Color.fromRGBO(215, 74, 0, 1),
-                                                ),
-                                              ),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  }
-                                });
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(
                                 FontAwesomeIcons.trash,
                                 color: Colors.red,
                               ),
@@ -280,7 +219,7 @@ class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
                                               style: TextStyle(color: Colors.black),
                                             ),
                                             TextSpan(
-                                              text: medicament.name,
+                                              text: medicineName,
                                               style: const TextStyle(
                                                   color: Colors.black,
                                                   fontWeight: FontWeight.bold,
