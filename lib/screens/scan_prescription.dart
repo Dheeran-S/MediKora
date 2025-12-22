@@ -201,7 +201,7 @@ IMPORTANT:
         'dosage': med['dosage'],
         'instructions': med['instructions'],
         'startDate': now,
-        'endDate': now.add(Duration(days: durationDays)),
+        'endDate': now.add(Duration(days: durationDays-1)),
         'times': times,
         'selectedDays': [true, true, true, true, true, true, true],
       });
