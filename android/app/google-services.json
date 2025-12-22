@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "923341983778",
+    "project_id": "pills-2378d",
+    "storage_bucket": "pills-2378d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:923341983778:android:ef130980a8245de498ba7b",
+        "android_client_info": {
+          "package_name": "com.pingupills.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqwLU4XftNgfNtCwBezqqOV3a7wMZf5Ds"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
