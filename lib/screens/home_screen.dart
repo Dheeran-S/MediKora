@@ -45,7 +45,7 @@ class HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     refreshReminderList();
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(255, 244, 236, 1),
+      backgroundColor: const Color(0xFFF7FAFC),
       body: Stack(
         children: [
           const ElipseBackground(),
@@ -96,7 +96,8 @@ class HomeScreenState extends State<HomeScreen> {
                   return const SizedBox.shrink();
                 } else {
                   List<ReminderWithCards>? applicableReminders = snapshot.data;
-                  if (applicableReminders != null && applicableReminders.isNotEmpty) {
+                  if (applicableReminders != null &&
+                      applicableReminders.isNotEmpty) {
                     return _buildReminderCardInfoList(applicableReminders);
                   }
                 }
@@ -111,11 +112,13 @@ class HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Future<List<ReminderWithCards>> _getApplicableReminders(List<Reminder> reminders) async {
+  Future<List<ReminderWithCards>> _getApplicableReminders(
+      List<Reminder> reminders) async {
     List<ReminderWithCards> applicableReminders = [];
 
     for (Reminder reminder in reminders) {
-      List<ReminderCard> reminderCards = await ReminderDatabase().getReminderCardsForSelectedDay(reminder.id, _selectedDay);
+      List<ReminderCard> reminderCards = await ReminderDatabase()
+          .getReminderCardsForSelectedDay(reminder.id, _selectedDay);
       if (reminderCards.isNotEmpty) {
         applicableReminders.add(ReminderWithCards(reminder, reminderCards));
       }
@@ -124,7 +127,8 @@ class HomeScreenState extends State<HomeScreen> {
     return applicableReminders;
   }
 
-  Widget _buildReminderCardInfoList(List<ReminderWithCards> applicableReminders) {
+  Widget _buildReminderCardInfoList(
+      List<ReminderWithCards> applicableReminders) {
     return FutureBuilder<List<_ReminderCardInfo>>(
       future: _getReminderCardInfos(applicableReminders),
       builder: (context, snapshot) {
@@ -143,37 +147,41 @@ class HomeScreenState extends State<HomeScreen> {
 
   Widget _buildReminderCardsColumn(List<_ReminderCardInfo> reminderCardInfos) {
     return Column(
-        children: [
-          ...reminderCardInfos.map((info) {
-            return MedicationReminderCard(
-              onCardUpdated: (updatedCard) {
-                int index = reminderCardInfos.indexWhere(
-                      (info) => info.reminderCard.cardId == updatedCard.cardId,
-                );
+      children: [
+        ...reminderCardInfos.map((info) {
+          return MedicationReminderCard(
+            onCardUpdated: (updatedCard) {
+              int index = reminderCardInfos.indexWhere(
+                (info) => info.reminderCard.cardId == updatedCard.cardId,
+              );
 
-                if (index != -1) {
-                  reminderCardInfos[index] =
-                      _ReminderCardInfo(updatedCard, reminderCardInfos[index].reminder);
-                }
-              },
-              cardId: info.reminderCard.cardId,
-              reminderId: info.reminderCard.reminderId,
-              medicineName: info.reminder.medicineName,
-              day: info.reminderCard.day,
-              time: info.reminderCard.time,
-              intakeQuantity: info.reminderCard.intakeQuantity,
-              isTaken: info.reminderCard.isTaken,
-              isJumped: info.reminderCard.isJumped,
-              pressedTime: info.reminderCard.pressedTime,
-            );
-          }),
-          const SizedBox(height: 150),
-        ],
+              if (index != -1) {
+                reminderCardInfos[index] = _ReminderCardInfo(
+                    updatedCard, reminderCardInfos[index].reminder);
+
+                // setState(() {
+                //   _remindersFuture = getReminders();
+                // });
+              }
+            },
+            cardId: info.reminderCard.cardId,
+            reminderId: info.reminderCard.reminderId,
+            medicineName: info.reminder.medicineName,
+            day: info.reminderCard.day,
+            time: info.reminderCard.time,
+            intakeQuantity: info.reminderCard.intakeQuantity,
+            isTaken: info.reminderCard.isTaken,
+            isJumped: info.reminderCard.isJumped,
+            pressedTime: info.reminderCard.pressedTime,
+          );
+        }),
+        const SizedBox(height: 150),
+      ],
     );
   }
+
   Future<List<_ReminderCardInfo>> _getReminderCardInfos(
       List<ReminderWithCards> reminderWithCardsList) async {
-
     List<_ReminderCardInfo> reminderCardInfos = [];
 
     for (var reminderWithCards in reminderWithCardsList) {
@@ -185,7 +193,6 @@ class HomeScreenState extends State<HomeScreen> {
     }
     return reminderCardInfos;
   }
-
 
   int _compareTimeOfDay(TimeOfDay a, TimeOfDay b) {
     int hourComparison = a.hour.compareTo(b.hour);
@@ -201,12 +208,16 @@ class HomeScreenState extends State<HomeScreen> {
       child: FractionallySizedBox(
         widthFactor: 0.9,
         child: Card(
-          margin: const EdgeInsets.symmetric(vertical: 7),
+          color: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
+            borderRadius: BorderRadius.circular(20),
+            side: const BorderSide(
+              color: Color(0xFF6B46C1),
+              width: 4,
+            ),
           ),
-          elevation: 5,
-          color: const Color.fromRGBO(255, 218, 190, 1),
+          elevation: 0,
+          shadowColor: Color.fromRGBO(107, 70, 193, 0.1),
           child: const SizedBox(
             height: 150,
             child: Center(
@@ -215,7 +226,7 @@ class HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Color.fromRGBO(225, 95, 0, 1),
+                  color: Color(0xFF2D3748),
                 ),
               ),
             ),

@@ -62,10 +62,17 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
           child: Card(
             margin: const EdgeInsets.symmetric(vertical: 7),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(20),
+              side: BorderSide(
+                color: isTaken || isJumped
+                    ? const Color(0xFF6B46C1)
+                    : const Color(0xFF6B46C1),
+                width: 4,
+              ),
             ),
-            elevation: 5,
-            color: isTaken || isJumped ? const Color.fromRGBO(255, 122, 0, 1) : const Color.fromRGBO(255, 218, 190, 1),
+            elevation: 0,
+            shadowColor: Color.fromRGBO(107, 70, 193, 0.1),
+            color: isTaken ? const Color(0xFF6B46C1) : Colors.white,
             child: SizedBox(
               height: 150,
               child: Stack(
@@ -80,7 +87,11 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
                         child: Icon(
                           FontAwesomeIcons.ellipsisVertical,
                           size: 15,
-                          color: isNotToday ? const Color.fromRGBO(225, 95, 0, 0.6) : (isTaken || isJumped ? Colors.white : const Color.fromRGBO(225, 95, 0, 1)),
+                          color: isNotToday
+                              ? const Color(0xFF718096)
+                              : isTaken
+                                  ? Colors.white
+                                  : const Color(0xFF6B46C1),
                         ),
                       ),
                       Container(
@@ -95,7 +106,11 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
                                   child: Icon(
                                     FontAwesomeIcons.solidClock,
                                     size: 15,
-                                    color: isNotToday ? const Color.fromRGBO(225, 95, 0, 0.6) : (isTaken || isJumped ? Colors.white : const Color.fromRGBO(225, 95, 0, 1)),
+                                    color: isNotToday
+                                        ? const Color(0xFF718096)
+                                        : isTaken
+                                            ? Colors.white
+                                            : const Color(0xFF6B46C1),
                                   ),
                                 ),
                                 const SizedBox(width: 5),
@@ -105,7 +120,11 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
                                     fontFamily: 'Open_Sans',
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15,
-                                    color: isNotToday ? const Color.fromRGBO(225, 95, 0, 0.6) : (isTaken || isJumped ? Colors.white : const Color.fromRGBO(225, 95, 0, 1)),
+                                    color: isNotToday
+                                        ? const Color(0xFF718096)
+                                        : isTaken
+                                            ? Colors.white
+                                            : const Color(0xFF6B46C1),
                                   ),
                                 ),
                               ],
@@ -116,7 +135,11 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
                                 fontFamily: 'Open_Sans',
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
-                                color: isNotToday ? const Color.fromRGBO(225, 95, 0, 0.6) : (isTaken || isJumped ? Colors.white : const Color.fromRGBO(225, 95, 0, 1)),
+                                color: isNotToday
+                                    ? const Color(0xFF718096)
+                                    : isTaken
+                                        ? Colors.white
+                                        : const Color(0xFF2D3748),
                               ),
                             ),
                             if (isTaken) ...[
@@ -129,24 +152,24 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
                                   color: Colors.white,
                                 ),
                               ),
-                            ] else if (isNotToday) ... [
+                            ] else if (isNotToday) ...[
                               const Text(
                                 'Scheduled',
                                 style: TextStyle(
                                   fontFamily: 'Open_Sans',
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  color: Color.fromRGBO(225, 95, 0, 0.6),
+                                  color: Color(0xFF2D3748),
                                 ),
                               ),
-                            ] else if (!isTaken && !isJumped)...[
-                             Text(
+                            ] else if (!isTaken && !isJumped) ...[
+                              Text(
                                 '${widget.intakeQuantity} piece(s)',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontFamily: 'Open_Sans',
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  color: Color.fromRGBO(225, 95, 0, 1),
+                                  color: Color(0xFF6B46C1),
                                 ),
                               ),
                             ],
@@ -187,19 +210,23 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
                           elevation: 0,
                           shape: const RoundedRectangleBorder(
                             borderRadius: BorderRadius.only(
-                              bottomLeft: Radius.circular(10),
-                              bottomRight: Radius.circular(10),
+                              bottomLeft: Radius.circular(16),
+                              bottomRight: Radius.circular(16),
                             ),
                           ),
-                          backgroundColor: isNotToday ?  const Color.fromRGBO(225, 95, 0, 0.6) : const Color.fromRGBO(225, 95, 0, 1),
-                          foregroundColor: isNotToday ? Colors.white70 : Colors.white,
+                          backgroundColor: isNotToday
+                              ? const Color(0xFFE9D8FD)
+                              : const Color(0xFF6B46C1),
+                          foregroundColor: isNotToday
+                              ? const Color(0xFF6B46C1)
+                              : Colors.white,
                         ),
                         child: Text(
                           isTaken
                               ? '${pressedTime!.hour.toString().padLeft(2, '0')}:${pressedTime!.minute.toString().padLeft(2, '0')}'
                               : isJumped
-                              ? 'Skipped'
-                              : 'Take',
+                                  ? 'Skipped'
+                                  : 'Take',
                           style: const TextStyle(
                             fontFamily: 'Open_Sans',
                             fontSize: 16,
@@ -223,7 +250,7 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
       context: context,
       builder: (BuildContext context) {
         return Material(
-          color: const Color.fromRGBO(225, 95, 0, 1),
+          color: const Color(0xFF6B46C1),
           shape: const RoundedRectangleBorder(
             borderRadius: BorderRadius.vertical(
               top: Radius.circular(20),
@@ -267,7 +294,7 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
                     color: Colors.white,
                   ),
                 ),
-                if (isNotToday) ... [
+                if (isNotToday) ...[
                   const Text(
                     'Scheduled',
                     style: TextStyle(
@@ -277,104 +304,115 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
                       color: Colors.white,
                     ),
                   ),
-                ] else ... [
+                ] else ...[
                   const SizedBox(height: 20),
                   Row(
                     children: isJumped
                         ? [
-                      Expanded(
-                        flex: 1,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            _unSkipMedicamentIntake(context);
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromRGBO(255, 244, 236, 1),
-                            elevation: 5,
-                          ),
-                          child: const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(FontAwesomeIcons.rotateLeft, color: Color.fromRGBO(255, 122, 0, 1)),
-                              SizedBox(width: 5),
-                              Text(
-                                'Un-Skip',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromRGBO(255, 122, 0, 1),
+                            Expanded(
+                              flex: 1,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _unSkipMedicamentIntake(context);
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFE9D8FD),
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(FontAwesomeIcons.rotateLeft,
+                                        color: Color(0xFF6B46C1)),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      'Un-Skip',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Color(0xFF6B46C1),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ]
-                        : [
-                      Expanded(
-                        flex: 1,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (isTaken) {
-                              _changeIntakeTime(context);
-                            } else {
-                              _skipMedicamentIntake(context);
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromRGBO(255, 244, 236, 1),
-                            elevation: 5,
-                          ),
-                          child: Text(
-                            isTaken ? 'Time' : 'Skip',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Color.fromRGBO(255, 122, 0, 1),
                             ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        flex: 3,
-                        child: ElevatedButton(
-                          onPressed: () {
-                            if (isTaken) {
-                              _unTakeMedicament(context);
-                            } else {
-                              isTakeButton = false;
-                              _takeMedicament(context);
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromRGBO(255, 122, 0, 1),
-                            elevation: 5,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                  isTaken ? FontAwesomeIcons.rotateLeft : FontAwesomeIcons.check,
-                                  color: const Color.fromRGBO(255, 244, 236, 1)
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                isTaken ? 'Un-Take' : 'Take',
-                                textAlign: TextAlign.center,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Color.fromRGBO(255, 244, 236, 1),
+                          ]
+                        : [
+                            Expanded(
+                              flex: 1,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if (isTaken) {
+                                    _changeIntakeTime(context);
+                                  } else {
+                                    _skipMedicamentIntake(context);
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFE9D8FD),
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: Text(
+                                  isTaken ? 'Time' : 'Skip',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF6B46C1),
+                                  ),
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              flex: 3,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  if (isTaken) {
+                                    _unTakeMedicament(context);
+                                  } else {
+                                    isTakeButton = false;
+                                    _takeMedicament(context);
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFF6B46C1),
+                                  elevation: 0,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                        isTaken
+                                            ? FontAwesomeIcons.rotateLeft
+                                            : FontAwesomeIcons.check,
+                                        color: const Color(0xFFE9D8FD)),
+                                    const SizedBox(width: 5),
+                                    Text(
+                                      isTaken ? 'Un-Take' : 'Take',
+                                      textAlign: TextAlign.center,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: const Color(0xFFE9D8FD),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
                   ),
                 ]
               ],
@@ -397,7 +435,7 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
               child: const Text(
                 'OK',
                 style: TextStyle(
-                  color: Color.fromRGBO(215, 74, 0, 1),
+                  color: const Color(0xFF6B46C1),
                 ),
               ),
               onPressed: () {
@@ -409,6 +447,7 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
       },
     );
   }
+
   Future<void> _takeMedicament(BuildContext context) async {
     TimeOfDay now = TimeOfDay.now();
 
@@ -433,7 +472,9 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
 
     widget.onCardUpdated(updatedCard);
 
-    Navigator.pop(context);
+    if (!isTakeButton) {
+      Navigator.pop(context);
+    }
   }
 
   Future<void> _unTakeMedicament(BuildContext context) async {
@@ -460,7 +501,6 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
 
     Navigator.pop(context);
   }
-
 
   Future<void> _skipMedicamentIntake(BuildContext context) async {
     final updatedCard = ReminderCard(
@@ -523,7 +563,8 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
                   Expanded(
                     child: CupertinoDatePicker(
                       mode: CupertinoDatePickerMode.time,
-                      initialDateTime: DateTime(2024, 1, 1, pickedTime.hour, pickedTime.minute),
+                      initialDateTime: DateTime(
+                          2024, 1, 1, pickedTime.hour, pickedTime.minute),
                       onDateTimeChanged: (DateTime newDateTime) {
                         setState(() {
                           pickedTime = TimeOfDay.fromDateTime(newDateTime);
@@ -536,7 +577,7 @@ class MedicationReminderCardState extends State<MedicationReminderCard> {
                     child: Text(
                       '${pickedTime.hour}:${pickedTime.minute.toString().padLeft(2, '0')}',
                       style: const TextStyle(
-                        color: Color.fromRGBO(243, 83, 0, 1),
+                        color: const Color(0xFF6B46C1),
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),

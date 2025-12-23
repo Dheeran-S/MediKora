@@ -11,7 +11,6 @@ class NavigationMenu extends StatefulWidget {
 }
 
 class NavigationMenuState extends State<NavigationMenu> {
-
   void _refreshHomeScreenOnReminderSaved() {
     setState(() {});
   }
@@ -19,8 +18,8 @@ class NavigationMenuState extends State<NavigationMenu> {
   int selectedIndex = 0;
 
   List<Widget> get screens => [
-    HomeScreen(onReminderSaved: _refreshHomeScreenOnReminderSaved),
-  ];
+        HomeScreen(onReminderSaved: _refreshHomeScreenOnReminderSaved),
+      ];
 
   void onItemTapped(int index) {
     setState(() {
@@ -45,7 +44,7 @@ class NavigationMenuState extends State<NavigationMenu> {
       floatingActionButton: Stack(
         children: [
           Positioned(
-            bottom: kBottomNavigationBarHeight + 10,
+            bottom: kBottomNavigationBarHeight - 4,
             left: (MediaQuery.of(context).size.width - 150) / 2,
             child: MaterialButton(
               onPressed: null,
@@ -55,7 +54,7 @@ class NavigationMenuState extends State<NavigationMenu> {
               splashColor: Colors.transparent,
               highlightColor: Colors.transparent,
               child: Image.asset(
-                'assets/icons/pingu-transparent-shadow.png',
+                'assets/icons/kora-transparent1.png',
                 width: 120,
                 height: 120,
               ),
@@ -70,12 +69,12 @@ class NavigationMenuState extends State<NavigationMenu> {
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30),
-              topRight: Radius.circular(30),
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
             ),
             boxShadow: [
               BoxShadow(
-                color: Color.fromRGBO(0, 0, 0, 0.1),
+                color: Color.fromRGBO(107, 70, 193, 0.1),
                 blurRadius: 14,
                 offset: Offset(0, -1),
               )
@@ -92,7 +91,9 @@ class NavigationMenuState extends State<NavigationMenu> {
                   child: IconButton(
                     icon: ColorFiltered(
                       colorFilter: ColorFilter.mode(
-                        selectedIndex == 0 ? const Color.fromRGBO(185, 137, 102, 1) : const Color.fromRGBO(230, 217, 206, 1),
+                        selectedIndex == 0
+                            ? const Color(0xFF6B46C1)
+                            : const Color(0xFFE9D8FD),
                         BlendMode.srcIn,
                       ),
                       child: Image.asset(
@@ -111,15 +112,16 @@ class NavigationMenuState extends State<NavigationMenu> {
                     borderType: BorderType.RRect,
                     radius: const Radius.circular(15),
                     padding: const EdgeInsets.all(6),
-                    color: const Color.fromRGBO(225, 95, 0, 1),
+                    color: const Color(0xFF6B46C1),
                     child: IconButton(
                       icon: const Icon(
                         Icons.add,
-                        color: Color.fromRGBO(225, 95, 0, 1),
+                        color: const Color(0xFF6B46C1),
                         size: 24,
                       ),
                       onPressed: () {
-                        showControlCenter(context, _refreshHomeScreenOnReminderSaved);
+                        showControlCenter(
+                            context, _refreshHomeScreenOnReminderSaved);
                       },
                     ),
                   ),

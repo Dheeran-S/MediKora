@@ -266,9 +266,10 @@ IMPORTANT:
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF7FAFC),
       appBar: AppBar(
         title: const Text('Scan Prescription'),
-        backgroundColor: Colors.blue,
+        backgroundColor: const Color(0xFF6B46C1),
         foregroundColor: Colors.white,
         actions: [
           if (_remindersData != null && _remindersData!.isNotEmpty)
@@ -288,11 +289,11 @@ IMPORTANT:
               Container(
                 height: 300,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFFE9D8FD)),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(16),
                   child: Image.file(_image!, fit: BoxFit.cover),
                 ),
               )
@@ -300,12 +301,12 @@ IMPORTANT:
               Container(
                 height: 300,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey[200],
+                  border: Border.all(color: const Color(0xFFE9D8FD)),
+                  borderRadius: BorderRadius.circular(16),
+                  color: const Color(0xFFF7FAFC),
                 ),
                 child: const Center(
-                  child: Icon(Icons.camera_alt, size: 80, color: Colors.grey),
+                  child: Icon(Icons.camera_alt, size: 80, color: Color(0xFFE9D8FD)),
                 ),
               ),
             const SizedBox(height: 20),
@@ -318,8 +319,11 @@ IMPORTANT:
                     label: const Text('Take Photo'),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(16),
-                      backgroundColor: Colors.blue,
+                      backgroundColor: const Color(0xFF6B46C1),
                       foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                     ),
                   ),
                 ),
@@ -331,8 +335,11 @@ IMPORTANT:
                     label: const Text('From Gallery'),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(16),
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
+                      backgroundColor: const Color(0xFFE9D8FD),
+                      foregroundColor: const Color(0xFF6B46C1),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
                     ),
                   ),
                 ),
@@ -343,9 +350,9 @@ IMPORTANT:
               const Center(
                 child: Column(
                   children: [
-                    CircularProgressIndicator(),
+                    CircularProgressIndicator(color: Color(0xFF6B46C1)),
                     SizedBox(height: 10),
-                    Text('Analyzing prescription...'),
+                    Text('Analyzing prescription...', style: TextStyle(color: Color(0xFF2D3748))),
                   ],
                 ),
               ),
@@ -353,18 +360,18 @@ IMPORTANT:
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.red[100],
-                  borderRadius: BorderRadius.circular(8),
+                  color: const Color(0xFFE9D8FD),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
                   _error!,
-                  style: const TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Color(0xFF2D3748)),
                 ),
               ),
             if (_prescriptionData != null) ...[
               const Text(
                 'Prescription Details',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
               ),
               const SizedBox(height: 10),
               _buildInfoCard('Patient Name', _prescriptionData!['patientName']),
@@ -374,13 +381,20 @@ IMPORTANT:
               const SizedBox(height: 20),
               const Text(
                 'Medication Reminders',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
               ),
               const SizedBox(height: 10),
               if (_remindersData != null && _remindersData!.isNotEmpty)
                 ...(_remindersData!).map((reminder) {
                   return Card(
                     margin: const EdgeInsets.only(bottom: 10),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: const BorderSide(
+                        color: Color(0xFF6B46C1),
+                        width: 4,
+                      ),
+                    ),
                     child: Padding(
                       padding: const EdgeInsets.all(12),
                       child: Column(
@@ -388,7 +402,7 @@ IMPORTANT:
                         children: [
                           Row(
                             children: [
-                              const Icon(Icons.medication, color: Colors.blue),
+                              const Icon(Icons.medication, color: Color(0xFF6B46C1)),
                               const SizedBox(width: 8),
                               Expanded(
                                 child: Text(
@@ -396,6 +410,7 @@ IMPORTANT:
                                   style: const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 16,
+                                    color: Color(0xFF2D3748),
                                   ),
                                 ),
                               ),
@@ -428,8 +443,11 @@ IMPORTANT:
                 label: const Text('Create Reminders'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.all(16),
-                  backgroundColor: Colors.green,
+                  backgroundColor: const Color(0xFF6B46C1),
                   foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                 ),
               ),
             ],
@@ -444,6 +462,13 @@ IMPORTANT:
 
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(
+          color: Color(0xFF6B46C1),
+          width: 4,
+        ),
+      ),
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -453,13 +478,13 @@ IMPORTANT:
               label,
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Colors.grey,
+                color: Color(0xFF718096),
               ),
             ),
             const SizedBox(height: 5),
             Text(
               value.toString(),
-              style: const TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16, color: Color(0xFF2D3748)),
             ),
           ],
         ),
@@ -479,14 +504,14 @@ IMPORTANT:
               '$label:',
               style: const TextStyle(
                 fontWeight: FontWeight.w500,
-                color: Colors.grey,
+                color: Color(0xFF718096),
               ),
             ),
           ),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 14, color: Color(0xFF2D3748)),
             ),
           ),
         ],

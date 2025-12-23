@@ -28,253 +28,224 @@ class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
     setState(() {});
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(255, 244, 236, 1),
+      backgroundColor: const Color(0xFFF7FAFC),
       appBar: AppBar(
-        title: reminders.isEmpty ?  const Text('Manage Reminders') : Text('Manage Reminders (${reminders.length})'),
-        backgroundColor: Colors.transparent,
+        title: reminders.isEmpty
+            ? const Text('Manage Reminders')
+            : Text('Manage Reminders (${reminders.length})'),
+        backgroundColor: const Color(0xFF6B46C1),
+        foregroundColor: Colors.white,
+        elevation: 0,
       ),
       body: reminders.isEmpty
-        ? SizedBox(
-            height: 150,
-            child: Card(
-              color: const Color.fromRGBO(255, 218, 190, 1),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15.0),
-              ),
-              elevation: 5,
-              margin: const EdgeInsets.all(10),
-              child: const Center(
-                child: Text(
-                  'No reminders scheduled',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Color.fromRGBO(225, 95, 0, 1),
-                    fontSize: 20,
+          ? Center(
+              child: FractionallySizedBox(
+                widthFactor: 0.9,
+                child: Card(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                    side: const BorderSide(
+                      color: Color(0xFF6B46C1),
+                      width: 4,
+                    ),
+                  ),
+                  elevation: 0,
+                  shadowColor: const Color.fromRGBO(107, 70, 193, 0.1),
+                  child: const SizedBox(
+                    height: 150,
+                    child: Center(
+                      child: Text(
+                        "No reminders scheduled",
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF2D3748),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
-            ),
-          )
-        : ListView.builder(
-            itemCount: reminders.length,
-            itemBuilder: (context, index) {
-              Reminder reminder = reminders[index];
-              final medicineName = reminder.medicineName;
-              String formattedStartDate = DateFormat('yyyy/MM/dd').format(reminder.startDate);
-              String formattedEndDate = DateFormat('yyyy/MM/dd').format(reminder.endDate);
-              return Card(
-                color: const Color.fromRGBO(255, 95, 0, 1),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                elevation: 5,
-                margin: const EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 50,
-                      child: ListTile(
+            )
+          : ListView.builder(
+              itemCount: reminders.length,
+              itemBuilder: (context, index) {
+                Reminder reminder = reminders[index];
+                final medicineName = reminder.medicineName;
+                String formattedStartDate =
+                    DateFormat('yyyy/MM/dd').format(reminder.startDate);
+                String formattedEndDate =
+                    DateFormat('yyyy/MM/dd').format(reminder.endDate);
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    border: const Border(
+                      left: BorderSide(color: Color(0xFF6B46C1), width: 4),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color.fromRGBO(107, 70, 193, 0.1),
+                        blurRadius: 14,
+                        offset: const Offset(0, 1),
+                      )
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      ListTile(
                         title: RichText(
                           text: TextSpan(
                             children: <TextSpan>[
                               TextSpan(
-                                text: '${medicineName} ',
+                                text: '$medicineName ',
                                 style: const TextStyle(
-                                  color: Colors.white,
+                                  color: Color(0xFF2D3748),
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 22,
+                                  fontSize: 18,
                                 ),
                               ),
                               TextSpan(
                                 text: '($formattedStartDate - $formattedEndDate)',
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  fontWeight: FontWeight.normal,
+                                  color: Color(0xFF718096),
                                   fontSize: 12,
                                 ),
                               ),
                             ],
                           ),
-                        )
-                      ),
-                    ),
-                    Container(
-                      decoration: const BoxDecoration(
-                        color: Color.fromRGBO(239, 203, 187, 1),
-                        borderRadius: BorderRadius.only(
-                          bottomLeft: Radius.circular(15.0),
-                          bottomRight: Radius.circular(15.0),
                         ),
                       ),
-                      child: ListTile(
-                        subtitle: Column(
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                        child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            RichText(
-                              text: TextSpan(
-                                children: <TextSpan>[
-                                  const TextSpan(
-                                    text: 'Intake Quantity: ',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color.fromRGBO(225, 95, 0, 1),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: '${reminder.intakeQuantity} piece(s)',
-                                    style: const TextStyle(
-                                        color: Colors.black
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            RichText(
-                              text: TextSpan(
-                                children: <TextSpan>[
-                                  const TextSpan(
-                                    text: 'Times: ',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color.fromRGBO(225, 95, 0, 1),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: reminder.times.map((time) => time.format(context)).join(', '),
-                                    style: const TextStyle(
-                                        color: Colors.black
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            RichText(
-                              text: TextSpan(
-                                children: <TextSpan>[
-                                  const TextSpan(
-                                    text: 'Frequency: ',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color.fromRGBO(225, 95, 0, 1),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: getFrequencyText(reminder.selectedDays),
-                                    style: const TextStyle(
-                                        color: Colors.black
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            RichText(
-                              text: TextSpan(
-                                children: <TextSpan>[
-                                  const TextSpan(
-                                    text: 'Message: ',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color.fromRGBO(225, 95, 0, 1),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: reminder.reminderName.isEmpty ? 'It\'s time to take your medicament!' : reminder.reminderName,
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: <Widget>[
-                            IconButton(
-                              icon: const Icon(
-                                FontAwesomeIcons.trash,
-                                color: Colors.red,
-                              ),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text('Confirm'),
-                                      content: Text.rich(
-                                        TextSpan(
-                                          children: [
-                                            const TextSpan(
-                                              text: 'Are you sure you want to delete ',
-                                              style: TextStyle(color: Colors.black),
-                                            ),
-                                            TextSpan(
-                                              text: medicineName,
-                                              style: const TextStyle(
-                                                  color: Colors.black,
-                                                  fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                            const TextSpan(
-                                              text: ' reminder?',
-                                              style: TextStyle(color: Colors.black),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          child: const Text(
-                                            'Cancel',
-                                            style: TextStyle(
-                                              color: Color.fromRGBO(100, 50, 13 ,1),
-                                            ),
-                                          ),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                        TextButton(
-                                          child: const Text(
-                                            'Delete',
-                                            style: TextStyle(
-                                              color: Colors.red,
-                                            ),
-                                          ),
-                                          onPressed: () async {
-                                            await ReminderDatabase().deleteReminderByReminderId(reminder.id);
-                                            setState(() {
-                                              reminders.removeAt(index);
-                                            });
-                                            Navigator.of(context).pop();
-                                            widget.onReminderSaved();
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                            ),
+                            const Divider(),
+                            _buildDetailRow('Intake Quantity:', '${reminder.intakeQuantity} piece(s)'),
+                            _buildDetailRow('Times:', reminder.times.map((time) => time.format(context)).join(', ')),
+                            _buildDetailRow('Frequency:', getFrequencyText(reminder.selectedDays)),
+                            _buildDetailRow('Message:', reminder.reminderName.isEmpty
+                                  ? 'It\'s time to take your medicament!'
+                                  : reminder.reminderName),
                           ],
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
+                      Align(
+                        alignment: Alignment.bottomRight,
+                        child: IconButton(
+                          icon: const Icon(
+                            FontAwesomeIcons.trash,
+                            color: Color(0xFF6B46C1),
+                            size: 20,
+                          ),
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20)),
+                                  title: const Text(
+                                    'Confirm Deletion',
+                                    style: TextStyle(color: Color(0xFF2D3748)),
+                                  ),
+                                  content: Text.rich(
+                                    TextSpan(
+                                      children: [
+                                        const TextSpan(
+                                          text:
+                                              'Are you sure you want to delete the reminder for ',
+                                          style:
+                                              TextStyle(color: Color(0xFF718096)),
+                                        ),
+                                        TextSpan(
+                                          text: medicineName,
+                                          style: const TextStyle(
+                                              color: Color(0xFF2D3748),
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        const TextSpan(
+                                          text: '?',
+                                          style:
+                                              TextStyle(color: Color(0xFF718096)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  actions: <Widget>[
+                                    TextButton(
+                                      child: const Text(
+                                        'Cancel',
+                                        style: TextStyle(
+                                          color: Color(0xFF718096),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop();
+                                      },
+                                    ),
+                                    TextButton(
+                                      child: const Text(
+                                        'Delete',
+                                        style: TextStyle(
+                                          color: Color(0xFF6B46C1),
+                                          fontWeight: FontWeight.bold
+                                        ),
+                                      ),
+                                      onPressed: () async {
+                                        await ReminderDatabase()
+                                            .deleteReminderByReminderId(
+                                                reminder.id);
+                                        setState(() {
+                                          reminders.removeAt(index);
+                                        });
+                                        Navigator.of(context).pop();
+                                        widget.onReminderSaved();
+                                      },
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                );
+              },
+            ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2.0),
+      child: RichText(
+        text: TextSpan(
+          children: <TextSpan>[
+            TextSpan(
+              text: '$label ',
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF718096),
+              ),
+            ),
+            TextSpan(
+              text: value,
+              style: const TextStyle(color: Color(0xFF2D3748), fontSize: 14),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -303,7 +274,12 @@ class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
     if (selectedDays.every((day) => day)) {
       return 'Everyday';
     } else {
-      return selectedDays.asMap().entries.where((entry) => entry.value).map((entry) => _getDayName(entry.key)).join(', ');
+      return selectedDays
+          .asMap()
+          .entries
+          .where((entry) => entry.value)
+          .map((entry) => _getDayName(entry.key))
+          .join(', ');
     }
   }
 }

@@ -6,13 +6,11 @@ import 'package:app/model/reminders.dart';
 
 Future<void> _saveScannedReminders(
     List<Map<String, dynamic>> scannedReminders) async {
-
   final reminderDb = ReminderDatabase();
   final existing = await reminderDb.getReminders();
   int nextId = existing.isEmpty ? 1 : existing.last.id + 1;
 
   for (final data in scannedReminders) {
-
     final reminder = Reminder(
       id: nextId++,
       reminderName: data['reminderName'] ?? '',
@@ -44,8 +42,6 @@ Future<void> _saveScannedReminders(
   }
 }
 
-
-
 void showControlCenter(BuildContext context, VoidCallback onReminderSaved) {
   showModalBottomSheet(
     context: context,
@@ -59,8 +55,8 @@ void showControlCenter(BuildContext context, VoidCallback onReminderSaved) {
             decoration: const BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(30),
-                topRight: Radius.circular(30),
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
             ),
             child: SingleChildScrollView(
@@ -88,13 +84,15 @@ void showControlCenter(BuildContext context, VoidCallback onReminderSaved) {
                           await _saveScannedReminders(remindersData);
                           onReminderSaved(); // refresh HomeScreen
                         }
-
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
-                        backgroundColor: const Color.fromRGBO(225, 95, 0, 1),
-                        elevation: 4,
-                        shadowColor: Colors.black.withOpacity(0.5),
+                        backgroundColor: const Color(0xFF6B46C1),
+                        elevation: 0,
+                        shadowColor: Color.fromRGBO(107, 70, 193, 0.1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
                       icon: Image.asset(
                         'assets/icons/alarm_icon.png',
@@ -120,10 +118,13 @@ void showControlCenter(BuildContext context, VoidCallback onReminderSaved) {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: const Color.fromRGBO(199, 84, 0, 1),
-                        backgroundColor: const Color.fromRGBO(255, 198, 157, 1),
-                        elevation: 4,
-                        shadowColor: Colors.black.withOpacity(0.5),
+                        foregroundColor: const Color(0xFF6B46C1),
+                        backgroundColor: const Color(0xFFE9D8FD),
+                        elevation: 0,
+                        shadowColor: Color.fromRGBO(107, 70, 193, 0.1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
                       icon: Image.asset(
                         'assets/icons/calendar_icon.png',
@@ -146,10 +147,13 @@ void showControlCenter(BuildContext context, VoidCallback onReminderSaved) {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        foregroundColor: const Color.fromRGBO(199, 84, 0, 1),
-                        backgroundColor: const Color.fromRGBO(255, 198, 157, 1),
-                        elevation: 4,
-                        shadowColor: Colors.black.withOpacity(0.5),
+                        foregroundColor: const Color(0xFF6B46C1),
+                        backgroundColor: const Color(0xFFE9D8FD),
+                        elevation: 0,
+                        shadowColor: Color.fromRGBO(107, 70, 193, 0.1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
                       icon: const Icon(
                         Icons.settings,
@@ -163,11 +167,10 @@ void showControlCenter(BuildContext context, VoidCallback onReminderSaved) {
             ),
           ),
           Positioned(
-            bottom: 242,
+            bottom: 230,
             left: (MediaQuery.of(context).size.width - 120) / 2,
-            child:
-            Image.asset(
-              'assets/icons/pingu-transparent-shadow.png',
+            child: Image.asset(
+              'assets/icons/kora-transparent1.png',
               width: 120,
               height: 120,
             ),

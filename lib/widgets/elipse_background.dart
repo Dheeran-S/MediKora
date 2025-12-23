@@ -14,7 +14,7 @@ class ElipseBackground extends StatelessWidget {
             child: Container(
               width: 801,
               height: 553,
-              color: const Color.fromRGBO(225, 95, 0, 1),
+              color: const Color(0xFF6B46C1),
             ),
           ),
         ),

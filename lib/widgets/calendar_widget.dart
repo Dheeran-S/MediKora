@@ -45,9 +45,6 @@ class CalendarWidgetState extends State<CalendarWidget> {
     });
   }
 
-  // Calculate the number of days in the year (365 or 366)
-  //final daysInYear = DateTime(DateTime.now().year + 1, 1, 1).difference(DateTime(DateTime.now().year, 1, 1)).inDays;
-
   @override
   Widget build(BuildContext context) {
     final today = DateTime.now();
@@ -79,7 +76,7 @@ class CalendarWidgetState extends State<CalendarWidget> {
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color.fromRGBO(132, 48, 0, 1),
+                        color: Color(0xFFE9D8FD),
                       ),
                     ),
                   ],
@@ -95,8 +92,8 @@ class CalendarWidgetState extends State<CalendarWidget> {
             width: 60,
             height: 70,
             decoration: BoxDecoration(
-              color: const Color.fromRGBO(188, 73, 0, 1),
-              borderRadius: BorderRadius.circular(10),
+              color: const Color(0xFF6B46C1),
+              borderRadius: BorderRadius.circular(16),
             ),
           ),
         ),
@@ -132,7 +129,7 @@ class CalendarWidgetState extends State<CalendarWidget> {
                                 fontSize: MediaQuery.of(context).size.width * 0.025,
                                 fontWeight: FontWeight.bold,
                                 fontFamily: 'Open_Sans',
-                                color: const Color.fromRGBO(255, 244, 236, 1),
+                                color: const Color(0xFFE9D8FD),
                               ),
                             ),
                           ),
@@ -143,7 +140,7 @@ class CalendarWidgetState extends State<CalendarWidget> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: date.isAfter(DateTime.now()) ?
-                              const Color.fromRGBO(253, 165, 108, 1) : const Color.fromRGBO(255, 244, 236, 1),
+                              const Color(0xFFE9D8FD) : Colors.white,
                             ),
                             child: Center(
                               child: FittedBox(
@@ -155,7 +152,7 @@ class CalendarWidgetState extends State<CalendarWidget> {
                                     fontSize: 12,
                                     fontFamily: 'Open_Sans',
                                     color: date.isAfter(DateTime.now()) ?
-                                    Colors.black.withOpacity(0.5) : Colors.black,
+                                    const Color(0xFF718096) : const Color(0xFF2D3748),
                                   ),
                                 ),
                               ),
