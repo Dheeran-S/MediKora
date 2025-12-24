@@ -1,9 +1,14 @@
 import 'package:app/model/reminders.dart';
 import 'package:app/notifications/notification_checker.dart';
 import 'package:app/notifications/system_notification.dart';
-import 'package:flutter/material.dart';
+import 'package:app/screens/login_screen.dart';
+import 'package:app/services/auth_service.dart';
+import 'package:app/widgets/auth_wrapper.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'navigation_menu.dart';
 import 'package:app/env/env.dart';
@@ -16,7 +21,8 @@ void main() async {
           apiKey: Env.API_KEY,
           appId: Env.APP_ID,
           messagingSenderId: Env.MESSAGING_SENDER_ID,
-          projectId: Env.PROJECT_ID));
+          projectId: Env.PROJECT_ID,
+          storageBucket: Env.STORAGE_BUCKET));
 
   await ReminderDatabase().initDatabase();
 
@@ -32,7 +38,16 @@ void main() async {
 
   await setTimersOnAppStart();
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        Provider<AuthService>(
+          create: (_) => AuthService(),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -54,7 +69,7 @@ class MyApp extends StatelessWidget {
           bodyMedium: TextStyle(color: Color(0xFF718096)),
         ),
       ),
-      home: const NavigationMenu(),
+      home: const AuthWrapper(),
       debugShowCheckedModeBanner: false,
     );
   }

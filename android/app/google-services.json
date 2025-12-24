@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "923341983778",
-    "project_id": "pills-2378d",
-    "storage_bucket": "pills-2378d.firebasestorage.app"
+    "project_number": "147853767636",
+    "project_id": "medikora-f5352",
+    "storage_bucket": "medikora-f5352.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:923341983778:android:ef130980a8245de498ba7b",
+        "mobilesdk_app_id": "1:147853767636:android:9c9d287cfd7a756ab5dc41",
         "android_client_info": {
           "package_name": "com.pingupills.app"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCqwLU4XftNgfNtCwBezqqOV3a7wMZf5Ds"
+          "current_key": "AIzaSyDTaJ7HpxfvgVs7_At0dO7rv-1DQDXGS6c"
         }
       ],
       "services": {
