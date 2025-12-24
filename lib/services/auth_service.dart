@@ -43,6 +43,15 @@ class AuthService {
   }
 
   // Handle authentication errors
+  // Send password reset email
+  Future<void> sendPasswordResetEmail(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      throw _handleAuthError(e);
+    }
+  }
+
   String _handleAuthError(FirebaseAuthException e) {
     switch (e.code) {
       case 'user-not-found':
@@ -55,6 +64,12 @@ class AuthService {
         return 'The password provided is too weak.';
       case 'invalid-email':
         return 'The email address is not valid.';
+      case 'user-disabled':
+        return 'This account has been disabled.';
+      case 'too-many-requests':
+        return 'Too many requests. Please try again later.';
+      case 'operation-not-allowed':
+        return 'This operation is not allowed.';
       default:
         return 'An error occurred. Please try again.';
     }
