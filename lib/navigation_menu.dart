@@ -2,6 +2,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'screens/home_screen.dart';
+import 'screens/health_chat_screen.dart';
 import 'package:app/screens/control_center.dart';
 import 'services/auth_service.dart';
 
@@ -20,8 +21,9 @@ class NavigationMenuState extends State<NavigationMenu> {
   int selectedIndex = 0;
 
   List<Widget> get screens => [
-        HomeScreen(onReminderSaved: _refreshHomeScreenOnReminderSaved),
-      ];
+    HomeScreen(onReminderSaved: _refreshHomeScreenOnReminderSaved),
+    const HealthChatScreen(),
+  ];
 
   void onItemTapped(int index) {
     setState(() {
@@ -65,6 +67,16 @@ class NavigationMenuState extends State<NavigationMenu> {
                   ),
                 ],
               ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.chat, color: Color(0xFF6B46C1)),
+              title: const Text('Health Chat'),
+              onTap: () {
+                Navigator.pop(context);
+                setState(() {
+                  selectedIndex = 1;
+                });
+              },
             ),
             ListTile(
               leading: const Icon(Icons.person, color: Color(0xFF6B46C1)),
