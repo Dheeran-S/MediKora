@@ -126,11 +126,12 @@ class NavigationMenuState extends State<NavigationMenu> {
         backgroundColor: Colors.transparent,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: const Icon(Icons.menu, color: Color(0xFF6B46C1)),
+            icon: const Icon(Icons.menu, color: Colors.white),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
       ),
+      drawerEnableOpenDragGesture: false,
       body: IndexedStack(
         index: selectedIndex,
         children: screens,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:app/screens/settings_screen.dart';
 import 'package:app/screens/scan_prescription.dart';
 import 'manage_reminders_screen.dart';
 import 'package:app/model/reminders.dart';
@@ -134,34 +133,6 @@ void showControlCenter(BuildContext context, VoidCallback onReminderSaved) {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.3,
-                    height: 44,
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const SettingsScreen(),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: const Color(0xFF6B46C1),
-                        backgroundColor: const Color(0xFFE9D8FD),
-                        elevation: 0,
-                        shadowColor: Color.fromRGBO(107, 70, 193, 0.1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      icon: const Icon(
-                        Icons.settings,
-                        size: 17,
-                      ),
-                      label: const Text("Settings"),
-                    ),
-                  ),
                 ],
               ),
             ),
