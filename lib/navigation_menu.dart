@@ -8,6 +8,7 @@ import 'package:app/screens/settings_screen.dart';
 import 'services/auth_service.dart';
 import 'package:app/providers/language_provider.dart';
 import 'package:app/screens/appointment_screen.dart';
+import 'package:app/screens/profile_screen.dart';
 
 class NavigationMenu extends StatefulWidget {
   const NavigationMenu({super.key});
@@ -89,7 +90,10 @@ class NavigationMenuState extends State<NavigationMenu> {
                   title: Text(languageProvider.translate('navigation.profile')),
                   onTap: () {
                     Navigator.pop(context);
-                    // Add profile navigation here
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                    );
                   },
                 ),
                 ListTile(
