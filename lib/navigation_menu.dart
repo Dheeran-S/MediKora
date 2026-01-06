@@ -7,6 +7,7 @@ import 'package:app/screens/control_center.dart';
 import 'package:app/screens/settings_screen.dart';
 import 'services/auth_service.dart';
 import 'package:app/providers/language_provider.dart';
+import 'package:app/screens/appointment_screen.dart';
 
 class NavigationMenu extends StatefulWidget {
   const NavigationMenu({super.key});
@@ -89,6 +90,21 @@ class NavigationMenuState extends State<NavigationMenu> {
                   onTap: () {
                     Navigator.pop(context);
                     // Add profile navigation here
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.calendar_month, color: Color(0xFF6B46C1)),
+                  title: Text(
+                    languageProvider.translate('schedule appointment'),
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AppointmentScreen(),
+                      ),
+                    );
                   },
                 ),
                 ListTile(
