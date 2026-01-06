@@ -1,0 +1,72 @@
+{
+  "app_name": "MediKora",
+  "app_tagline": "Your Health Companion",
+  "navigation": {
+    "home": "Home",
+    "health_chat": "Health Chat",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "home": {
+    "no_reminders": "No reminders for today"
+  },
+  "settings": {
+    "title": "Settings",
+    "notifications": "Notifications",
+    "quantity_to_notify": "Quantity to notify low stock",
+    "days_before_expiry": "Days before medicament expiry",
+    "language": "Language",
+    "select_language": "Select Language"
+  },
+  "languages": {
+    "english": "English",
+    "tamil": "Tamil",
+    "hindi": "Hindi"
+  },
+  "control_center": {
+    "title": "Control Center",
+    "scan_prescription": "Scan Prescription",
+    "manage_reminders": "Manage Reminders",
+    "add_reminder": "Add Reminder"
+  },
+  "scan_prescription": {
+    "title": "Scan Prescription",
+    "capture_image": "Capture Image",
+    "select_from_gallery": "Select from Gallery",
+    "processing": "Processing...",
+    "scan_instructions": "Take a clear photo of your prescription",
+    "no_medicines_found": "No medicines found in prescription",
+    "save_reminders": "Save Reminders",
+    "error_capture": "Failed to capture image",
+    "error_processing": "Failed to process image"
+  },
+  "manage_reminders": {
+    "title": "Manage Reminders",
+    "title_with_count": "Manage Reminders ({count})",
+    "no_reminders": "No reminders yet",
+    "no_reminders_description": "Create your first medication reminder to get started",
+    "add_first_reminder": "Add Your First Reminder"
+  },
+  "health_chat": {
+    "title": "Health Assistant",
+    "welcome_message": "Hi! I can help you manage your medicines.\nFor example, you can ask:\n• What medicines should I carry for my trip?\n• Explain my medication schedule\n• What happens if I miss a dose?",
+    "ask_about_medicines": "Ask about your medicines…",
+    "no_medications": "No medications registered in system.",
+    "error_generating": "Sorry, I couldn't generate a response. Please try again or rephrase your question.",
+    "connection_error": "Something went wrong. Please check your internet connection and try again.",
+    "sending": "Sending..."
+  },
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "done": "Done",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "close": "Close"
+  }
+}

@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:app/providers/language_provider.dart';
 
 class ScanPrescription extends StatefulWidget {
   const ScanPrescription({Key? key}) : super(key: key);
@@ -13,7 +15,8 @@ class ScanPrescription extends StatefulWidget {
 
 class _ScanPrescriptionState extends State<ScanPrescription> {
   // Replace with your Gemini API key
-  static const String GEMINI_API_KEY = 'AIzaSyAh8eU8AW-NWuGSKs582Fvgb_m6lhLxp30';
+  static const String GEMINI_API_KEY =
+      'AIzaSyAgYG4OrYyFcvtNuojhKMA4TqW24MHpUO8';
   static const String GEMINI_API_URL =
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
@@ -93,10 +96,12 @@ class _ScanPrescriptionState extends State<ScanPrescription> {
             {
               'parts': [
                 {
-                  'text': '''Analyze this handwritten doctor prescription and extract the following information in JSON format:
+                  'text':
+                      '''Analyze this handwritten doctor prescription and extract the following information in JSON format. Please ensure the JSON is complete and properly formatted:
+
 {
   "patientName": "patient name if visible",
-  "doctorName": "doctor name if visible",
+  "doctorName": "doctor name if visible", 
   "date": "prescription date if visible (YYYY-MM-DD format)",
   "medications": [
     {
@@ -112,12 +117,16 @@ class _ScanPrescriptionState extends State<ScanPrescription> {
   "notes": "any additional notes"
 }
 
-IMPORTANT: 
+CRITICAL REQUIREMENTS:
+- Return ONLY valid JSON - no explanations, no markdown formatting, no text before/after
+- Ensure all opening braces have matching closing braces
+- Remove any trailing commas
 - For frequency, extract how many times per day the medication should be taken
 - For duration, extract only the number of days as an integer
 - If morning/evening is mentioned, set timesPerDay to 2
 - If thrice daily or three times, set timesPerDay to 3
-- Only return valid JSON. If any field is not visible or unclear, use null or 0 for numbers.'''
+- If any field is not visible or unclear, use null or 0 for numbers
+- Double-check that the JSON is complete before responding'''
                 },
                 {
                   'inline_data': {
@@ -139,14 +148,30 @@ IMPORTANT:
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
+
+        // Validate response structure
+        if (data['candidates'] == null ||
+            data['candidates'].isEmpty ||
+            data['candidates'][0]['content'] == null ||
+            data['candidates'][0]['content']['parts'] == null ||
+            data['candidates'][0]['content']['parts'].isEmpty) {
+          throw Exception('Invalid API response structure');
+        }
+
         final text = data['candidates'][0]['content']['parts'][0]['text'];
 
+        if (text == null || text.isEmpty) {
+          throw Exception('Empty response from API');
+        }
+
         //temp
-        print('🟡 Gemini raw body: ${response.body}');
+        //print('🟡 Gemini raw body: ${.bodresponsey}');
         //temp
 
-        // Extract JSON from the response
+        // Extract JSON from the response with better error handling
         String jsonText = text.trim();
+
+        // Remove markdown code blocks
         if (jsonText.startsWith('```json')) {
           jsonText = jsonText.substring(7);
         }
@@ -156,8 +181,44 @@ IMPORTANT:
         if (jsonText.endsWith('```')) {
           jsonText = jsonText.substring(0, jsonText.length - 3);
         }
+        jsonText = jsonText.trim();
 
-        final prescriptionData = jsonDecode(jsonText.trim());
+        // Try to find JSON object boundaries
+        int startIndex = jsonText.indexOf('{');
+        int endIndex = jsonText.lastIndexOf('}');
+
+        if (startIndex != -1 && endIndex != -1 && endIndex > startIndex) {
+          jsonText = jsonText.substring(startIndex, endIndex + 1);
+        }
+
+        Map<String, dynamic> prescriptionData;
+        try {
+          prescriptionData = jsonDecode(jsonText);
+        } catch (e) {
+          debugPrint('❌ JSON parsing error: $e');
+          debugPrint('❌ Raw JSON text: $jsonText');
+
+          // If JSON parsing fails, try to fix common issues
+          try {
+            String fixedJson = _fixCommonJsonIssues(jsonText);
+            debugPrint('🔧 Attempting to fix JSON: $fixedJson');
+            prescriptionData = jsonDecode(fixedJson);
+          } catch (e2) {
+            debugPrint('❌ Fixed JSON also failed: $e2');
+
+            // Create a fallback prescription data structure
+            prescriptionData = {
+              'patientName': null,
+              'doctorName': null,
+              'date': null,
+              'medications': [],
+              'diagnosis': null,
+              'notes':
+                  'Failed to parse prescription data. Please try again with a clearer image.',
+              'error': 'JSON parsing failed: ${e.toString()}'
+            };
+          }
+        }
 
         // Convert to reminders format
         final reminders = _convertToReminders(prescriptionData);
@@ -178,7 +239,44 @@ IMPORTANT:
     }
   }
 
-  List<Map<String, dynamic>> _convertToReminders(Map<String, dynamic> prescription) {
+  String _fixCommonJsonIssues(String jsonText) {
+    // Fix trailing commas
+    jsonText = jsonText.replaceAll(RegExp(r',\s*}'), '}');
+    jsonText = jsonText.replaceAll(RegExp(r',\s*\]'), ']');
+
+    // Fix missing closing braces for objects
+    int openBraces = jsonText.split('{').length - 1;
+    int closeBraces = jsonText.split('}').length - 1;
+    while (openBraces > closeBraces) {
+      jsonText += '}';
+      closeBraces++;
+    }
+
+    // Fix missing closing brackets for arrays
+    int openBrackets = jsonText.split('\[').length - 1;
+    int closeBrackets = jsonText.split('\]').length - 1;
+    while (openBrackets > closeBrackets) {
+      jsonText += ']';
+      closeBrackets++;
+    }
+
+    // Fix missing quotes around keys (common issue)
+    jsonText = jsonText.replaceAllMapped(
+      RegExp(r'(\w+):'),
+      (match) => '"${match.group(1)}":',
+    );
+
+    // Fix unquoted string values
+    jsonText = jsonText.replaceAllMapped(
+      RegExp(r':\s*([a-zA-Z][a-zA-Z0-9\s]*)'),
+      (match) => ': "${match.group(1)!.trim()}"',
+    );
+
+    return jsonText;
+  }
+
+  List<Map<String, dynamic>> _convertToReminders(
+      Map<String, dynamic> prescription) {
     List<Map<String, dynamic>> reminders = [];
 
     if (prescription['medications'] == null) return reminders;
@@ -201,7 +299,7 @@ IMPORTANT:
         'dosage': med['dosage'],
         'instructions': med['instructions'],
         'startDate': now,
-        'endDate': now.add(Duration(days: durationDays-1)),
+        'endDate': now.add(Duration(days: durationDays - 1)),
         'times': times,
         'selectedDays': [true, true, true, true, true, true, true],
       });
@@ -265,58 +363,204 @@ IMPORTANT:
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF7FAFC),
-      appBar: AppBar(
-        title: const Text('Scan Prescription'),
-        backgroundColor: const Color(0xFF6B46C1),
-        foregroundColor: Colors.white,
-        actions: [
-          if (_remindersData != null && _remindersData!.isNotEmpty)
-            IconButton(
-              icon: const Icon(Icons.check),
-              onPressed: _useReminders,
-              tooltip: 'Use Reminders',
-            ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (_image != null)
-              Container(
-                height: 300,
-                decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFE9D8FD)),
-                  borderRadius: BorderRadius.circular(16),
+    return Consumer<LanguageProvider>(
+      builder: (context, languageProvider, child) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFF7FAFC),
+          appBar: AppBar(
+            title: Text(languageProvider.translate('scan_prescription.title')),
+            backgroundColor: const Color(0xFF6B46C1),
+            foregroundColor: Colors.white,
+            actions: [
+              if (_remindersData != null && _remindersData!.isNotEmpty)
+                IconButton(
+                  icon: const Icon(Icons.check),
+                  onPressed: _useReminders,
+                  tooltip: languageProvider
+                      .translate('scan_prescription.save_reminders'),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Image.file(_image!, fit: BoxFit.cover),
-                ),
-              )
-            else
-              Container(
-                height: 300,
-                decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFE9D8FD)),
-                  borderRadius: BorderRadius.circular(16),
-                  color: const Color(0xFFF7FAFC),
-                ),
-                child: const Center(
-                  child: Icon(Icons.camera_alt, size: 80, color: Color(0xFFE9D8FD)),
-                ),
-              ),
-            const SizedBox(height: 20),
-            Row(
+            ],
+          ),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _isLoading ? null : _captureImage,
-                    icon: const Icon(Icons.camera),
-                    label: const Text('Take Photo'),
+                if (_image != null)
+                  Container(
+                    height: 300,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xFFE9D8FD)),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: Image.file(_image!, fit: BoxFit.cover),
+                    ),
+                  )
+                else
+                  Container(
+                    height: 300,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: const Color(0xFFE9D8FD)),
+                      borderRadius: BorderRadius.circular(16),
+                      color: const Color(0xFFF7FAFC),
+                    ),
+                    child: Center(
+                      child: Icon(Icons.camera_alt,
+                          size: 80, color: Color(0xFFE9D8FD)),
+                    ),
+                  ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _isLoading ? null : _captureImage,
+                        icon: const Icon(Icons.camera),
+                        label: Text(languageProvider
+                            .translate('scan_prescription.capture_image')),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(16),
+                          backgroundColor: const Color(0xFF6B46C1),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _isLoading ? null : _pickFromGallery,
+                        icon: const Icon(Icons.photo_library),
+                        label: Text(languageProvider.translate(
+                            'scan_prescription.select_from_gallery')),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(16),
+                          backgroundColor: const Color(0xFFE9D8FD),
+                          foregroundColor: const Color(0xFF6B46C1),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                if (_isLoading)
+                  Center(
+                    child: Column(
+                      children: [
+                        CircularProgressIndicator(color: Color(0xFF6B46C1)),
+                        SizedBox(height: 10),
+                        Text(
+                            languageProvider
+                                .translate('scan_prescription.processing'),
+                            style: TextStyle(color: Color(0xFF2D3748))),
+                      ],
+                    ),
+                  ),
+                if (_error != null)
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE9D8FD),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Text(
+                      _error!,
+                      style: const TextStyle(color: Color(0xFF2D3748)),
+                    ),
+                  ),
+                if (_prescriptionData != null) ...[
+                  Text(
+                    'Prescription Details',
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2D3748)),
+                  ),
+                  const SizedBox(height: 10),
+                  _buildInfoCard(
+                      'Patient Name', _prescriptionData!['patientName']),
+                  _buildInfoCard(
+                      'Doctor Name', _prescriptionData!['doctorName']),
+                  _buildInfoCard('Date', _prescriptionData!['date']),
+                  _buildInfoCard('Diagnosis', _prescriptionData!['diagnosis']),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Medication Reminders',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF2D3748)),
+                  ),
+                  const SizedBox(height: 10),
+                  if (_remindersData != null && _remindersData!.isNotEmpty)
+                    ...(_remindersData!).map((reminder) {
+                      return Card(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          side: const BorderSide(
+                            color: Color(0xFF6B46C1),
+                            width: 4,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Icon(Icons.medication,
+                                      color: Color(0xFF6B46C1)),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      reminder['reminderName'],
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        color: Color(0xFF2D3748),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const Divider(),
+                              _buildReminderRow('Dosage',
+                                  reminder['dosage'] ?? 'Not specified'),
+                              _buildReminderRow('Quantity',
+                                  '${reminder['intakeQuantity']} unit(s)'),
+                              _buildReminderRow(
+                                'Times',
+                                (reminder['times'] as List<TimeOfDay>)
+                                    .map((t) =>
+                                        '${t.hour}:${t.minute.toString().padLeft(2, '0')}')
+                                    .join(', '),
+                              ),
+                              _buildReminderRow(
+                                'Duration',
+                                '${reminder['startDate'].toString().split(' ')[0]} to ${reminder['endDate'].toString().split(' ')[0]}',
+                              ),
+                              if (reminder['instructions'] != null)
+                                _buildReminderRow(
+                                    'Instructions', reminder['instructions']),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    onPressed: _useReminders,
+                    icon: const Icon(Icons.alarm_add),
+                    label: const Text('Create Reminders'),
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.all(16),
                       backgroundColor: const Color(0xFF6B46C1),
@@ -326,139 +570,18 @@ IMPORTANT:
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _isLoading ? null : _pickFromGallery,
-                    icon: const Icon(Icons.photo_library),
-                    label: const Text('From Gallery'),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.all(16),
-                      backgroundColor: const Color(0xFFE9D8FD),
-                      foregroundColor: const Color(0xFF6B46C1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                    ),
-                  ),
-                ),
+                ],
               ],
             ),
-            const SizedBox(height: 20),
-            if (_isLoading)
-              const Center(
-                child: Column(
-                  children: [
-                    CircularProgressIndicator(color: Color(0xFF6B46C1)),
-                    SizedBox(height: 10),
-                    Text('Analyzing prescription...', style: TextStyle(color: Color(0xFF2D3748))),
-                  ],
-                ),
-              ),
-            if (_error != null)
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE9D8FD),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  _error!,
-                  style: const TextStyle(color: Color(0xFF2D3748)),
-                ),
-              ),
-            if (_prescriptionData != null) ...[
-              const Text(
-                'Prescription Details',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
-              ),
-              const SizedBox(height: 10),
-              _buildInfoCard('Patient Name', _prescriptionData!['patientName']),
-              _buildInfoCard('Doctor Name', _prescriptionData!['doctorName']),
-              _buildInfoCard('Date', _prescriptionData!['date']),
-              _buildInfoCard('Diagnosis', _prescriptionData!['diagnosis']),
-              const SizedBox(height: 20),
-              const Text(
-                'Medication Reminders',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF2D3748)),
-              ),
-              const SizedBox(height: 10),
-              if (_remindersData != null && _remindersData!.isNotEmpty)
-                ...(_remindersData!).map((reminder) {
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: const BorderSide(
-                        color: Color(0xFF6B46C1),
-                        width: 4,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              const Icon(Icons.medication, color: Color(0xFF6B46C1)),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  reminder['reminderName'],
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Color(0xFF2D3748),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const Divider(),
-                          _buildReminderRow('Dosage', reminder['dosage'] ?? 'Not specified'),
-                          _buildReminderRow('Quantity', '${reminder['intakeQuantity']} unit(s)'),
-                          _buildReminderRow(
-                            'Times',
-                            (reminder['times'] as List<TimeOfDay>)
-                                .map((t) => '${t.hour}:${t.minute.toString().padLeft(2, '0')}')
-                                .join(', '),
-                          ),
-                          _buildReminderRow(
-                            'Duration',
-                            '${reminder['startDate'].toString().split(' ')[0]} to ${reminder['endDate'].toString().split(' ')[0]}',
-                          ),
-                          if (reminder['instructions'] != null)
-                            _buildReminderRow('Instructions', reminder['instructions']),
-                        ],
-                      ),
-                    ),
-                  );
-                }).toList(),
-              const SizedBox(height: 20),
-              ElevatedButton.icon(
-                onPressed: _useReminders,
-                icon: const Icon(Icons.alarm_add),
-                label: const Text('Create Reminders'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.all(16),
-                  backgroundColor: const Color(0xFF6B46C1),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
   Widget _buildInfoCard(String label, dynamic value) {
-    if (value == null || value.toString().isEmpty) return const SizedBox.shrink();
+    if (value == null || value.toString().isEmpty)
+      return const SizedBox.shrink();
 
     return Card(
       margin: const EdgeInsets.only(bottom: 10),

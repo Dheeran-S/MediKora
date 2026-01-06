@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Preferences {
   int lowQuantity = 1;
   int daysBeforeExpiry = 1;
+  String selectedLanguage = 'en';
 
   void setLowQuantity(int newQuantity) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -26,5 +27,17 @@ class Preferences {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     daysBeforeExpiry = prefs.getInt('daysBeforeExpiry') ?? 1;
     return daysBeforeExpiry;
+  }
+
+  void setSelectedLanguage(String languageCode) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selected_language', languageCode);
+    selectedLanguage = languageCode;
+  }
+
+  Future<String> getSelectedLanguage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    selectedLanguage = prefs.getString('selected_language') ?? 'en';
+    return selectedLanguage;
   }
 }

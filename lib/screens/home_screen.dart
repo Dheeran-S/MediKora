@@ -3,6 +3,8 @@ import 'package:app/model/reminders.dart';
 import 'package:app/widgets/calendar_widget.dart';
 import 'package:app/widgets/medication_reminder_card_widget.dart';
 import 'package:app/widgets/elipse_background.dart';
+import 'package:provider/provider.dart';
+import 'package:app/providers/language_provider.dart';
 
 late Future<List<Reminder>> _remindersFuture;
 
@@ -204,35 +206,39 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Widget noRemindersCard() {
-    return Center(
-      child: FractionallySizedBox(
-        widthFactor: 0.9,
-        child: Card(
-          color: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-            side: const BorderSide(
-              color: Color(0xFF6B46C1),
-              width: 4,
-            ),
-          ),
-          elevation: 0,
-          shadowColor: Color.fromRGBO(107, 70, 193, 0.1),
-          child: const SizedBox(
-            height: 150,
-            child: Center(
-              child: Text(
-                "No reminders for today",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF2D3748),
+    return Consumer<LanguageProvider>(
+      builder: (context, languageProvider, child) {
+        return Center(
+          child: FractionallySizedBox(
+            widthFactor: 0.9,
+            child: Card(
+              color: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+                side: const BorderSide(
+                  color: Color(0xFF6B46C1),
+                  width: 4,
+                ),
+              ),
+              elevation: 0,
+              shadowColor: Color.fromRGBO(107, 70, 193, 0.1),
+              child: SizedBox(
+                height: 150,
+                child: Center(
+                  child: Text(
+                    languageProvider.translate('home.no_reminders'),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF2D3748),
+                    ),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

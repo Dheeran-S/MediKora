@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   flutter_local_notifications: ^17.0.0
   permission_handler: ^11.3.1
   cupertino_icons: ^1.0.6
@@ -40,7 +42,7 @@ dependencies:
   flutter_launcher_icons: ^0.13.1
   font_awesome_flutter: 10.4.0
   sqflite: ^2.3.3
-  intl: ^0.19.0
+  intl: ^0.18.1
   envied: ^0.5.4+1
   analyzer: ^5.13.0
   envify: ^2.0.3
@@ -89,6 +91,7 @@ flutter:
     - assets/icons/
     - assets/images/
     - assets/database/
+    - assets/languages/
     # - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

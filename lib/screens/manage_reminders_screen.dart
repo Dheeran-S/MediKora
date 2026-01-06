@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 import '../model/reminders.dart';
+import 'package:provider/provider.dart';
+import 'package:app/providers/language_provider.dart';
 
 class ManageRemindersScreen extends StatefulWidget {
   final VoidCallback onReminderSaved;
@@ -34,8 +36,25 @@ class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
       backgroundColor: const Color(0xFFF7FAFC),
       appBar: AppBar(
         title: reminders.isEmpty
-            ? const Text('Manage Reminders')
-            : Text('Manage Reminders (${reminders.length})'),
+            ? Consumer<LanguageProvider>(
+                builder: (context, languageProvider, child) {
+                  return Text(
+                    languageProvider.translate('manage_reminders.no_reminders'),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF2D3748),
+                    ),
+                  );
+                },
+              )
+            : Consumer<LanguageProvider>(
+                builder: (context, languageProvider, child) {
+                  return Text(languageProvider
+                      .translate('manage_reminders.title_with_count')
+                      .replaceAll('{count}', '${reminders.length}'));
+                },
+              ),
         backgroundColor: const Color(0xFF6B46C1),
         foregroundColor: Colors.white,
         elevation: 0,
@@ -55,16 +74,21 @@ class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
                   ),
                   elevation: 0,
                   shadowColor: const Color.fromRGBO(107, 70, 193, 0.1),
-                  child: const SizedBox(
+                  child: SizedBox(
                     height: 150,
                     child: Center(
-                      child: Text(
-                        "No reminders scheduled",
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF2D3748),
-                        ),
+                      child: Consumer<LanguageProvider>(
+                        builder: (context, languageProvider, child) {
+                          return Text(
+                            languageProvider
+                                .translate('manage_reminders.no_reminders'),
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF2D3748),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
@@ -81,7 +105,8 @@ class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
                 String formattedEndDate =
                     DateFormat('yyyy/MM/dd').format(reminder.endDate);
                 return Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
@@ -105,16 +130,17 @@ class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
                               TextSpan(
                                 text: '$medicineName ',
                                 style: const TextStyle(
-                                  color: Color(0xFF2D3748),
+                                  color: const Color(0xFF2D3748),
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
                                 ),
                               ),
                               TextSpan(
-                                text: '($formattedStartDate - $formattedEndDate)',
+                                text:
+                                    '($formattedStartDate - $formattedEndDate)',
                                 style: const TextStyle(
                                   fontWeight: FontWeight.normal,
-                                  color: Color(0xFF718096),
+                                  color: const Color(0xFF718096),
                                   fontSize: 12,
                                 ),
                               ),
@@ -128,12 +154,20 @@ class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const Divider(),
-                            _buildDetailRow('Intake Quantity:', '${reminder.intakeQuantity} piece(s)'),
-                            _buildDetailRow('Times:', reminder.times.map((time) => time.format(context)).join(', ')),
-                            _buildDetailRow('Frequency:', getFrequencyText(reminder.selectedDays)),
-                            _buildDetailRow('Message:', reminder.reminderName.isEmpty
-                                  ? 'It\'s time to take your medicament!'
-                                  : reminder.reminderName),
+                            _buildDetailRow('Intake Quantity:',
+                                '${reminder.intakeQuantity} piece(s)'),
+                            _buildDetailRow(
+                                'Times:',
+                                reminder.times
+                                    .map((time) => time.format(context))
+                                    .join(', ')),
+                            _buildDetailRow('Frequency:',
+                                getFrequencyText(reminder.selectedDays)),
+                            _buildDetailRow(
+                                'Message:',
+                                reminder.reminderName.isEmpty
+                                    ? 'It\'s time to take your medicament!'
+                                    : reminder.reminderName),
                           ],
                         ),
                       ),
@@ -162,19 +196,19 @@ class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
                                         const TextSpan(
                                           text:
                                               'Are you sure you want to delete the reminder for ',
-                                          style:
-                                              TextStyle(color: Color(0xFF718096)),
+                                          style: TextStyle(
+                                              color: Color(0xFF718096)),
                                         ),
                                         TextSpan(
                                           text: medicineName,
                                           style: const TextStyle(
-                                              color: Color(0xFF2D3748),
+                                              color: const Color(0xFF2D3748),
                                               fontWeight: FontWeight.bold),
                                         ),
                                         const TextSpan(
                                           text: '?',
-                                          style:
-                                              TextStyle(color: Color(0xFF718096)),
+                                          style: TextStyle(
+                                              color: Color(0xFF718096)),
                                         ),
                                       ],
                                     ),
@@ -195,9 +229,8 @@ class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
                                       child: const Text(
                                         'Delete',
                                         style: TextStyle(
-                                          color: Color(0xFF6B46C1),
-                                          fontWeight: FontWeight.bold
-                                        ),
+                                            color: Color(0xFF6B46C1),
+                                            fontWeight: FontWeight.bold),
                                       ),
                                       onPressed: () async {
                                         await ReminderDatabase()
@@ -236,12 +269,13 @@ class _ManageRemindersScreenState extends State<ManageRemindersScreen> {
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF718096),
+                color: const Color(0xFF718096),
               ),
             ),
             TextSpan(
               text: value,
-              style: const TextStyle(color: Color(0xFF2D3748), fontSize: 14),
+              style:
+                  const TextStyle(color: const Color(0xFF2D3748), fontSize: 14),
             ),
           ],
         ),
