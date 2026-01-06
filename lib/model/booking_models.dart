@@ -68,6 +68,8 @@ class Slot {
   final String startTime;
   final String endTime;
   final String status;
+  final String? bookedByName;
+  final String? bookedByEmail;
 
   Slot({
     required this.id,
@@ -77,6 +79,8 @@ class Slot {
     required this.startTime,
     required this.endTime,
     required this.status,
+    this.bookedByName,
+    this.bookedByEmail,
   });
 
   factory Slot.fromFirestore(DocumentSnapshot doc) {
@@ -89,6 +93,8 @@ class Slot {
       startTime: data['startTime'] ?? '',
       endTime: data['endTime'] ?? '',
       status: data['status'] ?? 'AVAILABLE',
+      bookedByName: data['bookedByName'],
+      bookedByEmail: data['bookedByEmail'],
     );
   }
 }

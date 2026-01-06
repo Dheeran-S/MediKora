@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:app/model/booking_models.dart';
 import 'package:app/services/booking_service.dart';
+import 'package:app/screens/user_appointments_screen.dart';
 
 class AppointmentScreen extends StatefulWidget {
   const AppointmentScreen({super.key});
@@ -112,7 +113,15 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
 
     setState(() => _isBooking = true);
 
-    final success = await _bookingService.bookSlot(_selectedSlot!.id, user.uid);
+    final userName = user.displayName ?? 'Valued User';
+    final userEmail = user.email ?? 'No Email';
+
+    final success = await _bookingService.bookSlot(
+      _selectedSlot!.id, 
+      user.uid,
+      userName,
+      userEmail,
+    );
 
     setState(() => _isBooking = false);
 
@@ -148,7 +157,22 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
       appBar: AppBar(
         title: const Text('Schedule Appointment'),
         backgroundColor: const Color(0xFF6B46C1),
+        foregroundColor: Colors.white,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const UserAppointmentsScreen(),
+                ),
+              );
+            },
+            tooltip: 'My Appointments',
+          ),
+        ],
       ),
       body: _isLoadingHospitals
           ? const Center(child: CircularProgressIndicator(color: Color(0xFF6B46C1)))
