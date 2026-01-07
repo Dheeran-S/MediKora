@@ -50,8 +50,8 @@ A specialized Web Dashboard designed exclusively for hospital administrators. Th
 
 | Resource | Link |
 | :--- | :--- |
-| **Repository** | [LINK_TO_BE_ADDED] |
-| **Live Deployment** | [LINK_TO_BE_ADDED] |
+| **Repository** | https://github.com/aravind5423/MediKora_Hospital |
+| **Live Deployment** | https://medi-kora-hospital.vercel.app/ |
 
 ---
 
