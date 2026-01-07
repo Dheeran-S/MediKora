@@ -15,10 +15,14 @@ class AppointmentScreen extends StatefulWidget {
 class _AppointmentScreenState extends State<AppointmentScreen> {
   final BookingService _bookingService = BookingService();
 
-  List<Hospital> _hospitals = [];
+  List<Hospital> _allHospitals = [];
+  List<Hospital> _filteredHospitals = [];
+  List<String> _cities = [];
+  
   List<Doctor> _doctors = [];
   List<Slot> _slots = [];
 
+  String? _selectedCity;
   Hospital? _selectedHospital;
   Doctor? _selectedDoctor;
   DateTime _selectedDate = DateTime.now();
@@ -37,8 +41,35 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
 
   Future<void> _loadHospitals() async {
     setState(() => _isLoadingHospitals = true);
-    _hospitals = await _bookingService.getHospitals();
-    setState(() => _isLoadingHospitals = false);
+    final hospitals = await _bookingService.getHospitals();
+    
+    // Extract unique cities
+    final cities = hospitals.map((h) => h.city).toSet().toList()..sort();
+
+    setState(() {
+      _allHospitals = hospitals;
+      _filteredHospitals = hospitals; // Initially show all, or empty if preferred
+      _cities = cities;
+      _isLoadingHospitals = false;
+    });
+  }
+
+  void _filterHospitals(String? city) {
+    setState(() {
+      _selectedCity = city;
+      if (city == null) {
+        _filteredHospitals = _allHospitals;
+      } else {
+        _filteredHospitals = _allHospitals.where((h) => h.city == city).toList();
+      }
+      
+      // Reset downstream selections
+      _selectedHospital = null;
+      _doctors = [];
+      _selectedDoctor = null;
+      _slots = [];
+      _selectedSlot = null;
+    });
   }
 
   Future<void> _loadDoctors(String hospitalId) async {
@@ -181,13 +212,31 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle('1. Select Hospital'),
+                  _buildSectionTitle('1. Select City'),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    value: _selectedCity,
+                    decoration: _inputDecoration('Choose City'),
+                    isExpanded: true,
+                    items: _cities.map((city) {
+                      return DropdownMenuItem(
+                        value: city,
+                        child: Text(city),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      _filterHospitals(value);
+                    },
+                  ),
+                  const SizedBox(height: 24),
+
+                  _buildSectionTitle('2. Select Hospital'),
                   const SizedBox(height: 8),
                   DropdownButtonFormField<Hospital>(
                     value: _selectedHospital,
                     decoration: _inputDecoration('Choose Hospital'),
                     isExpanded: true,
-                    items: _hospitals.map((hospital) {
+                    items: _filteredHospitals.map((hospital) {
                       return DropdownMenuItem(
                         value: hospital,
                         child: Text(hospital.name),
@@ -205,7 +254,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
 
                   if (_selectedHospital != null) ...[
                     const SizedBox(height: 24),
-                    _buildSectionTitle('2. Select Doctor'),
+                    _buildSectionTitle('3. Select Doctor'),
                     const SizedBox(height: 8),
                     if (_isLoadingDoctors)
                       const Center(child: CircularProgressIndicator())
@@ -233,7 +282,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
 
                   if (_selectedDoctor != null) ...[
                     const SizedBox(height: 24),
-                    _buildSectionTitle('3. Select Date'),
+                    _buildSectionTitle('4. Select Date'),
                     const SizedBox(height: 8),
                     InkWell(
                       onTap: () => _selectDate(context),
@@ -257,7 +306,7 @@ class _AppointmentScreenState extends State<AppointmentScreen> {
                     ),
 
                     const SizedBox(height: 24),
-                    _buildSectionTitle('4. Available Slots'),
+                    _buildSectionTitle('5. Available Slots'),
                     const SizedBox(height: 8),
                     if (_isLoadingSlots)
                       const Center(child: CircularProgressIndicator())

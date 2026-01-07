@@ -173,6 +173,22 @@ class _UserAppointmentsScreenState extends State<UserAppointmentsScreen> {
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 16),
+                            SizedBox(
+                              width: double.infinity,
+                              child: OutlinedButton(
+                                onPressed: () => _cancelAppointment(slot.id),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.red,
+                                  side: const BorderSide(color: Colors.red),
+                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: const Text('Cancel Appointment'),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -180,5 +196,50 @@ class _UserAppointmentsScreenState extends State<UserAppointmentsScreen> {
                   },
                 ),
     );
+  }
+
+  Future<void> _cancelAppointment(String slotId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Cancel Appointment'),
+        content: const Text(
+          'Are you sure you want to cancel this appointment? This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('No, Keep It'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: const Text('Yes, Cancel'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      if (!mounted) return;
+      
+      setState(() => _isLoading = true);
+      
+      final success = await _bookingService.cancelSlot(slotId);
+      
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Appointment cancelled successfully')),
+        );
+        _loadAppointments();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Failed to cancel appointment')),
+        );
+      }
+    }
   }
 }

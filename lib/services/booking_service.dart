@@ -131,4 +131,21 @@ class BookingService {
       return [];
     }
   }
+
+  Future<bool> cancelSlot(String slotId) async {
+    await initialize();
+    try {
+      await _firestore!.collection('slots').doc(slotId).update({
+        'status': 'AVAILABLE',
+        'bookedBy': FieldValue.delete(),
+        'bookedByName': FieldValue.delete(),
+        'bookedByEmail': FieldValue.delete(),
+        'bookedAt': FieldValue.delete(),
+      });
+      return true;
+    } catch (e) {
+      debugPrint('Error cancelling slot: $e');
+      return false;
+    }
+  }
 }
